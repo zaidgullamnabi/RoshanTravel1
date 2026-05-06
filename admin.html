@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel – Roshan Travels</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background:var(--gray-50); margin:0; padding:0; }
+    .chart-bar { height:180px; display:flex; align-items:flex-end; gap:8px; padding:0 8px; }
+    .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; }
+    .bar { width:100%; background:linear-gradient(to top, var(--primary), var(--primary-light)); border-radius:6px 6px 0 0; transition:height 0.5s ease; }
+    .bar-label { font-size:0.68rem; color:var(--text-light); text-align:center; }
+    .bar-val { font-size:0.72rem; color:var(--primary); font-weight:700; }
+    .admin-badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:0.72rem; font-weight:700; }
+    .badge-green { background:rgba(26,107,60,0.1); color:var(--primary); }
+    .badge-orange { background:rgba(244,166,35,0.15); color:var(--secondary-dark); }
+    .badge-red { background:rgba(229,57,53,0.1); color:var(--danger); }
+    .badge-blue { background:rgba(59,130,246,0.1); color:#3b82f6; }
+    .pkg-thumb { width:50px; height:38px; border-radius:6px; overflow:hidden; }
+    .pkg-thumb img { width:100%; height:100%; object-fit:cover; }
+    .admin-search { display:flex; align-items:center; gap:8px; background:var(--gray-50); border:1.5px solid var(--gray-200); border-radius:var(--radius-sm); padding:9px 14px; width:260px; }
+    .admin-search input { background:transparent; border:none; font-size:0.875rem; color:var(--text-dark); width:100%; }
+    .admin-search i { color:var(--gray-400); }
+    .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .form-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+    .access-denied { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; text-align:center; padding:40px; background:var(--gray-50); }
+    .access-denied i { font-size:5rem; color:var(--danger); margin-bottom:20px; }
+    .quick-action { display:flex; align-items:center; gap:12px; padding:14px; border-radius:var(--radius-md); background:var(--gray-50); cursor:pointer; transition:var(--transition); border:1px solid transparent; }
+    .quick-action:hover { background:var(--accent); border-color:var(--primary); }
+    .quick-action-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1rem; }
+    .revenue-total { font-family:var(--font-display); font-size:2rem; font-weight:700; color:var(--primary); }
+    @media(max-width:768px){ .admin-sidebar{ width:100%; position:relative; height:auto; } .admin-main{ margin-left:0; } .admin-layout{ grid-template-columns:1fr; } .admin-stats-grid{ grid-template-columns:1fr 1fr; } .form-grid-2,.form-grid-3{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+<div id="page-loader" class="page-loader">
+  <div class="loader-logo">⚙ Admin Panel</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+<div id="toast-container" class="toast-container"></div>
+
+<!-- ACCESS DENIED (shown if not admin) -->
+<div id="access-denied" style="display:none;" class="access-denied">
+  <i class="fas fa-shield-alt"></i>
+  <h2 style="font-family:var(--font-display);font-size:2rem;margin-bottom:10px;">Admin Access Required</h2>
+  <p style="color:var(--text-light);margin-bottom:24px;max-width:400px;">You need admin credentials to access this panel. Please login with your admin account.</p>
+  <div style="background:var(--accent);border-radius:var(--radius-md);padding:16px 24px;margin-bottom:24px;font-size:0.875rem;color:var(--primary);">
+    <strong>Demo Admin:</strong><br>Email: admin@roshantravels.pk<br>Password: admin123
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+    <button class="btn btn-primary btn-lg" onclick="showAdminLogin()"><i class="fas fa-sign-in-alt"></i> Admin Login</button>
+    <a href="index.html" class="btn btn-outline btn-lg"><i class="fas fa-home"></i> Go Home</a>
+  </div>
+</div>
+
+<!-- ADMIN PANEL (shown if admin) -->
+<div id="admin-panel" style="display:none;">
+  <div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+      <div class="admin-logo">
+        <div class="admin-logo-icon">⚙</div>
+        <div>
+          <div class="admin-logo-text">Roshan Admin</div>
+          <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);">Control Panel</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px;padding:12px;background:rgba(255,255,255,0.06);border-radius:var(--radius-md);">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.875rem;font-weight:700;">A</div>
+          <div>
+            <div style="color:white;font-size:0.875rem;font-weight:600;">Admin</div>
+            <div style="color:rgba(255,255,255,0.45);font-size:0.72rem;">admin@roshantravels.pk</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.3);padding:0 14px;margin-bottom:8px;">Main</div>
+      <nav class="admin-nav">
+        <div class="admin-nav-item active" onclick="switchAdminPanel('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+        <div class="admin-nav-item" onclick="switchAdminPanel('packages')"><i class="fas fa-suitcase"></i> Packages</div>
+        <div class="admin-nav-item" onclick="switchAdminPanel('bookings')"><i class="fas fa-calendar-check"></i> Bookings</div>
+        <div class="admin-nav-item" onclick="switchAdminPanel('contacts')"><i class="fas fa-envelope"></i> Contacts</div>
+        <div class="admin-nav-item" onclick="switchAdminPanel('users')"><i class="fas fa-users"></i> Users</div>
+      </nav>
+
+      <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.3);padding:0 14px;margin:20px 0 8px;">Settings</div>
+      <nav class="admin-nav">
+        <div class="admin-nav-item" onclick="switchAdminPanel('settings')"><i class="fas fa-cog"></i> Site Settings</div>
+        <a href="index.html" class="admin-nav-item" style="text-decoration:none;"><i class="fas fa-globe"></i> View Website</a>
+        <div class="admin-nav-item" style="color:#ff6b6b;" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+
+      <!-- TOP BAR -->
+      <div class="admin-topbar">
+        <div class="admin-page-title" id="admin-page-title">📊 Dashboard Overview</div>
+        <div class="admin-topbar-actions">
+          <div class="admin-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search…" id="admin-search-input" />
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="switchAdminPanel('packages'); openAddPackage()">
+            <i class="fas fa-plus"></i> Add Package
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-content">
+
+        <!-- ══ DASHBOARD PANEL ══ -->
+        <div class="admin-panel active" id="apanel-dashboard">
+
+          <!-- Stats -->
+          <div class="admin-stats-grid">
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon" style="background:rgba(26,107,60,0.1);color:var(--primary);"><i class="fas fa-suitcase"></i></div>
+              <div>
+                <div class="admin-stat-num" style="color:var(--primary);" id="stat-pkgs">8</div>
+                <div class="admin-stat-label">Total Packages</div>
+                <div class="admin-stat-change">+2 this month</div>
+              </div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon" style="background:rgba(244,166,35,0.15);color:var(--secondary-dark);"><i class="fas fa-calendar-check"></i></div>
+              <div>
+                <div class="admin-stat-num" style="color:var(--secondary-dark);" id="stat-bookings">0</div>
+                <div class="admin-stat-label">Total Bookings</div>
+                <div class="admin-stat-change">Live data</div>
+              </div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;"><i class="fas fa-envelope"></i></div>
+              <div>
+                <div class="admin-stat-num" style="color:#3b82f6;" id="stat-contacts">0</div>
+                <div class="admin-stat-label">Contact Enquiries</div>
+                <div class="admin-stat-change">Pending review</div>
+              </div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon" style="background:rgba(168,85,247,0.1);color:#a855f7;"><i class="fas fa-rupee-sign"></i></div>
+              <div>
+                <div class="admin-stat-num revenue-total" id="stat-revenue">PKR 0</div>
+                <div class="admin-stat-label">Total Revenue</div>
+                <div class="admin-stat-change">All time</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts + Quick Actions Row -->
+          <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;margin-bottom:24px;">
+
+            <!-- Revenue Chart -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <h3>📈 Monthly Revenue (PKR)</h3>
+                <span class="admin-badge badge-green">2025</span>
+              </div>
+              <div style="padding:20px;">
+                <div class="chart-bar" id="revenue-chart">
+                  <!-- Bars rendered by JS -->
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:0 8px;margin-top:4px;">
+                  <span style="font-size:0.68rem;color:var(--text-light);">Jan</span>
+                  <span style="font-size:0.68rem;color:var(--text-light);">Feb</span>
+                  <span style="font-size:0.68rem;color:var(--text-light);">Mar</span>
+                  <span style="font-size:0.68rem;color:var(--text-light);">Apr</span>
+                  <span style="font-size:0.68rem;color:var(--text-light);">May</span>
+                  <span style="font-size:0.68rem;color:var(--text-light);">Jun</span>
+                  <span style="font-size:0.68rem;color:var(--text-light);">Jul</span>
+                  <span style="font-size:0.68rem;color:var(--text-light);">Aug</span>
+                  <span style="font-size:0.68rem;color:var(--text-light);">Sep</span>
+                  <span style="font-size:0.68rem;color:var(--text-light);">Oct</span>
+                  <span style="font-size:0.68rem;color:var(--text-light);">Nov</span>
+                  <span style="font-size:0.68rem;color:var(--text-light);">Dec</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="admin-card">
+              <div class="admin-card-header"><h3>⚡ Quick Actions</h3></div>
+              <div style="padding:16px;display:flex;flex-direction:column;gap:8px;">
+                <div class="quick-action" onclick="switchAdminPanel('packages');openAddPackage()">
+                  <div class="quick-action-icon" style="background:rgba(26,107,60,0.1);color:var(--primary);"><i class="fas fa-plus"></i></div>
+                  <span style="font-size:0.875rem;font-weight:600;">Add New Package</span>
+                </div>
+                <div class="quick-action" onclick="switchAdminPanel('bookings')">
+                  <div class="quick-action-icon" style="background:rgba(244,166,35,0.15);color:var(--secondary-dark);"><i class="fas fa-list"></i></div>
+                  <span style="font-size:0.875rem;font-weight:600;">View All Bookings</span>
+                </div>
+                <div class="quick-action" onclick="switchAdminPanel('contacts')">
+                  <div class="quick-action-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;"><i class="fas fa-envelope"></i></div>
+                  <span style="font-size:0.875rem;font-weight:600;">Check Enquiries</span>
+                </div>
+                <a href="index.html" target="_blank" class="quick-action" style="text-decoration:none;">
+                  <div class="quick-action-icon" style="background:rgba(168,85,247,0.1);color:#a855f7;"><i class="fas fa-external-link-alt"></i></div>
+                  <span style="font-size:0.875rem;font-weight:600;">Preview Website</span>
+                </a>
+                <a href="https://wa.me/923001234567" target="_blank" class="quick-action" style="text-decoration:none;">
+                  <div class="quick-action-icon" style="background:rgba(37,211,102,0.1);color:#25D366;"><i class="fab fa-whatsapp"></i></div>
+                  <span style="font-size:0.875rem;font-weight:600;">WhatsApp Support</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Packages Table -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3>🔥 Top Performing Packages</h3>
+              <button class="btn btn-outline btn-sm" onclick="switchAdminPanel('packages')">View All</button>
+            </div>
+            <table class="admin-table" id="top-packages-table">
+              <thead><tr><th>Package</th><th>Destination</th><th>Price</th><th>Rating</th><th>Reviews</th><th>Status</th></tr></thead>
+              <tbody id="top-packages-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ══ PACKAGES PANEL ══ -->
+        <div class="admin-panel" id="apanel-packages">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3>🎒 All Packages (<span id="pkg-count">8</span>)</h3>
+              <button class="btn btn-primary btn-sm" onclick="openAddPackage()"><i class="fas fa-plus"></i> Add Package</button>
+            </div>
+            <table class="admin-table">
+              <thead><tr><th>Image</th><th>Title</th><th>Category</th><th>Duration</th><th>Price</th><th>Discount</th><th>Rating</th><th>Featured</th><th>Actions</th></tr></thead>
+              <tbody id="packages-admin-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ══ BOOKINGS PANEL ══ -->
+        <div class="admin-panel" id="apanel-bookings">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3>📋 All Bookings</h3>
+              <div style="display:flex;gap:8px;">
+                <select class="filter-select" id="booking-status-filter" onchange="filterAdminBookings()" style="min-width:130px;">
+                  <option value="">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+            <div id="bookings-admin-body" style="padding:20px;">
+              <div style="text-align:center;padding:40px;color:var(--text-light);">
+                <i class="fas fa-calendar-times" style="font-size:2.5rem;color:var(--gray-300);display:block;margin-bottom:16px;"></i>
+                No bookings found. Bookings will appear here when users book packages.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ CONTACTS PANEL ══ -->
+        <div class="admin-panel" id="apanel-contacts">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3>📬 Contact Enquiries</h3>
+              <span class="admin-badge badge-orange" id="contacts-count">0 New</span>
+            </div>
+            <div id="contacts-admin-body" style="padding:20px;">
+              <div style="text-align:center;padding:40px;color:var(--text-light);">
+                <i class="fas fa-inbox" style="font-size:2.5rem;color:var(--gray-300);display:block;margin-bottom:16px;"></i>
+                No contact enquiries yet.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ USERS PANEL ══ -->
+        <div class="admin-panel" id="apanel-users">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3>👥 Registered Users</h3>
+              <span class="admin-badge badge-green" id="users-count">0 Users</span>
+            </div>
+            <table class="admin-table">
+              <thead><tr><th>Name</th><th>Email</th><th>Joined</th><th>Bookings</th><th>Actions</th></tr></thead>
+              <tbody id="users-admin-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ══ SETTINGS PANEL ══ -->
+        <div class="admin-panel" id="apanel-settings">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+            <div class="admin-card">
+              <div class="admin-card-header"><h3>⚙️ Site Settings</h3></div>
+              <div style="padding:24px;">
+                <form onsubmit="saveSettings(event)">
+                  <div class="form-group"><label class="form-label">Agency Name</label><input type="text" class="form-input" value="Roshan Travels" /></div>
+                  <div class="form-group"><label class="form-label">Tagline</label><input type="text" class="form-input" value="Discover Pakistan's Hidden Wonders" /></div>
+                  <div class="form-group"><label class="form-label">Phone</label><input type="text" class="form-input" value="+92 300 123 4567" /></div>
+                  <div class="form-group"><label class="form-label">WhatsApp</label><input type="text" class="form-input" value="923001234567" /></div>
+                  <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" value="info@roshantravels.pk" /></div>
+                  <div class="form-group"><label class="form-label">Office Address</label><textarea class="form-textarea" style="min-height:80px;">2nd Floor, Travel Hub, Blue Area, Islamabad</textarea></div>
+                  <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Settings</button>
+                </form>
+              </div>
+            </div>
+            <div class="admin-card">
+              <div class="admin-card-header"><h3>🔐 Change Admin Password</h3></div>
+              <div style="padding:24px;">
+                <form onsubmit="changeAdminPass(event)">
+                  <div class="form-group"><label class="form-label">Current Password</label><input type="password" class="form-input" id="cur-pass" /></div>
+                  <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input" id="new-pass" /></div>
+                  <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" class="form-input" id="conf-pass" /></div>
+                  <button type="submit" class="btn btn-primary"><i class="fas fa-lock"></i> Change Password</button>
+                </form>
+              </div>
+              <div class="admin-card-header" style="border-top:1px solid var(--gray-100);margin-top:24px;"><h3>📊 System Info</h3></div>
+              <div style="padding:20px;display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;justify-content:space-between;font-size:0.875rem;"><span style="color:var(--text-light);">Version</span><strong>v1.0.0</strong></div>
+                <div style="display:flex;justify-content:space-between;font-size:0.875rem;"><span style="color:var(--text-light);">Database</span><strong>RESTful Table API</strong></div>
+                <div style="display:flex;justify-content:space-between;font-size:0.875rem;"><span style="color:var(--text-light);">Frontend</span><strong>HTML5 + CSS3 + JS</strong></div>
+                <div style="display:flex;justify-content:space-between;font-size:0.875rem;"><span style="color:var(--text-light);">Last Updated</span><strong>May 2025</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end admin-content -->
+    </main>
+  </div><!-- end admin-layout -->
+</div>
+
+<!-- ADD/EDIT PACKAGE MODAL -->
+<div class="modal-overlay" id="pkg-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 id="pkg-modal-title"><i class="fas fa-plus" style="color:var(--primary);margin-right:8px;"></i> Add Package</h3>
+      <button class="modal-close" onclick="closeModal('pkg-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="pkg-form" onsubmit="savePackage(event)">
+        <div class="form-grid-2">
+          <div class="form-group"><label class="form-label">Package Title *</label><input type="text" id="f-title" class="form-input" required placeholder="e.g. Hunza Valley Splendor" /></div>
+          <div class="form-group"><label class="form-label">Destination *</label><input type="text" id="f-dest" class="form-input" required placeholder="e.g. Hunza, Gilgit-Baltistan" /></div>
+          <div class="form-group"><label class="form-label">Duration *</label><input type="text" id="f-duration" class="form-input" required placeholder="e.g. 7 Days / 6 Nights" /></div>
+          <div class="form-group"><label class="form-label">Nights *</label><input type="number" id="f-nights" class="form-input" required min="1" placeholder="e.g. 6" /></div>
+        </div>
+        <div class="form-grid-3">
+          <div class="form-group"><label class="form-label">Base Price (PKR) *</label><input type="number" id="f-base" class="form-input" required placeholder="85000" /></div>
+          <div class="form-group"><label class="form-label">Discount %</label><input type="number" id="f-discount" class="form-input" placeholder="0" min="0" max="100" value="0" onchange="calcFinalPrice()" /></div>
+          <div class="form-group"><label class="form-label">Final Price (PKR)</label><input type="number" id="f-final" class="form-input" placeholder="Auto-calculated" /></div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select id="f-cat" class="form-select" required>
+              <option value="">Select Category</option>
+              <option value="Northern">Northern Pakistan</option>
+              <option value="Adventure">Adventure</option>
+              <option value="Historical">Historical</option>
+              <option value="Beach">Beach & Coast</option>
+              <option value="Cultural">Cultural</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Badge Label</label>
+            <input type="text" id="f-badge" class="form-input" placeholder="e.g. Best Seller, Top Rated" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Image URL *</label>
+          <input type="url" id="f-image" class="form-input" required placeholder="https://images.unsplash.com/..." />
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group"><label class="form-label">Rating (out of 5)</label><input type="number" id="f-rating" class="form-input" step="0.1" min="1" max="5" value="4.5" /></div>
+          <div class="form-group">
+            <label class="form-label">Featured?</label>
+            <select id="f-featured" class="form-select">
+              <option value="true">Yes — Show on Homepage</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Description *</label><textarea id="f-desc" class="form-textarea" style="min-height:100px;" required placeholder="Describe the package..."></textarea></div>
+        <div class="form-group"><label class="form-label">Highlights (comma separated)</label><input type="text" id="f-highlights" class="form-input" placeholder="Attabad Lake, Baltit Fort, Rakaposhi View" /></div>
+        <div class="form-grid-2">
+          <div class="form-group"><label class="form-label">Included Services (one per line)</label><textarea id="f-included" class="form-textarea" placeholder="AC Transport&#10;Hotel Accommodation&#10;Daily Breakfast"></textarea></div>
+          <div class="form-group"><label class="form-label">Excluded Items (one per line)</label><textarea id="f-excluded" class="form-textarea" placeholder="Airfare&#10;Lunch&#10;Personal Expenses"></textarea></div>
+        </div>
+        <input type="hidden" id="f-edit-id" value="" />
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('pkg-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="document.getElementById('pkg-form').dispatchEvent(new Event('submit'))">
+        <i class="fas fa-save"></i> <span id="pkg-save-btn-text">Add Package</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- BOOKING DETAIL MODAL -->
+<div class="modal-overlay" id="booking-detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-calendar-check" style="color:var(--primary);margin-right:8px;"></i> Booking Details</h3>
+      <button class="modal-close" onclick="closeModal('booking-detail-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="booking-detail-content"></div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="modal-overlay" id="admin-login-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-lock" style="color:var(--primary);margin-right:8px;"></i> Admin Login</h3>
+      <button class="modal-close" onclick="closeModal('admin-login-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="admin-login-form" onsubmit="adminLogin(event)">
+        <div class="form-group"><label class="form-label">Admin Email</label><input type="email" id="al-email" class="form-input" value="admin@roshantravels.pk" required /></div>
+        <div class="form-group"><label class="form-label">Password</label><input type="password" id="al-pass" class="form-input" value="admin123" required /></div>
+        <div style="background:var(--accent);border-radius:8px;padding:12px;margin-bottom:16px;font-size:0.8rem;color:var(--primary);">
+          <strong>Demo Credentials:</strong> admin@roshantravels.pk / admin123
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;"><i class="fas fa-unlock"></i> Login to Admin Panel</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+// ─── Admin Auth Check ───────────────────────────
+function checkAdminAccess() {
+  const isAdmin = Auth.isAdmin();
+  const user = Auth.getUser();
+  if (isAdmin && user) {
+    document.getElementById('access-denied').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    initAdminDashboard();
+  } else {
+    document.getElementById('access-denied').style.display = 'flex';
+    document.getElementById('admin-panel').style.display = 'none';
+  }
+}
+
+function showAdminLogin() { openModal('admin-login-modal'); }
+
+function adminLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('al-email').value;
+  const pass = document.getElementById('al-pass').value;
+  const result = Auth.login(email, pass);
+  if (result.ok && result.isAdmin) {
+    closeModal('admin-login-modal');
+    showToast('Welcome, Admin!', 'Access granted to admin panel.', 'success');
+    checkAdminAccess();
+  } else {
+    showToast('Access Denied', 'Invalid admin credentials.', 'error');
+  }
+}
+
+function adminLogout() {
+  Auth.logout();
+  showToast('Logged out', 'Admin session ended.', 'warning');
+  setTimeout(() => { checkAdminAccess(); }, 600);
+}
+
+// ─── Panel Switching ────────────────────────────
+const panelTitles = {
+  dashboard: '📊 Dashboard Overview',
+  packages: '🎒 Manage Packages',
+  bookings: '📋 Manage Bookings',
+  contacts: '📬 Contact Enquiries',
+  users: '👥 Manage Users',
+  settings: '⚙️ Settings',
+};
+
+function switchAdminPanel(panel) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`apanel-${panel}`)?.classList.add('active');
+  document.querySelectorAll('.admin-nav-item').forEach(n => {
+    if (n.getAttribute('onclick')?.includes(panel)) n.classList.add('active');
+  });
+  document.getElementById('admin-page-title').textContent = panelTitles[panel] || 'Admin';
+  if (panel === 'bookings') loadAdminBookings();
+  if (panel === 'contacts') loadAdminContacts();
+  if (panel === 'users') loadAdminUsers();
+}
+
+// ─── Dashboard Init ─────────────────────────────
+function initAdminDashboard() {
+  // Render top packages table
+  const tbody = document.getElementById('top-packages-body');
+  if (tbody) {
+    tbody.innerHTML = PACKAGES_DATA.map(pkg => `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="pkg-thumb"><img src="${pkg.image}" alt="${pkg.title}" /></div>
+            <span style="font-weight:600;font-size:0.875rem;">${pkg.title}</span>
+          </div>
+        </td>
+        <td><span style="font-size:0.82rem;color:var(--text-light);">${pkg.destination}</span></td>
+        <td><strong style="color:var(--primary);">${formatPKR(pkg.final_price)}</strong></td>
+        <td><span style="color:var(--secondary-dark);font-weight:600;">⭐ ${pkg.rating}</span></td>
+        <td>${pkg.reviews_count}</td>
+        <td><span class="admin-badge ${pkg.featured ? 'badge-green' : 'badge-orange'}">${pkg.featured ? 'Featured' : 'Standard'}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  // Revenue chart (demo data)
+  const revenueData = [320000, 480000, 390000, 520000, 610000, 740000, 890000, 720000, 580000, 490000, 320000, 0];
+  const maxRev = Math.max(...revenueData);
+  const chart = document.getElementById('revenue-chart');
+  if (chart) {
+    chart.innerHTML = revenueData.map((val, i) => {
+      const h = maxRev > 0 ? Math.round((val / maxRev) * 160) : 0;
+      return `
+      <div class="bar-col">
+        <div class="bar-val">${val > 0 ? Math.round(val/1000) + 'K' : '-'}</div>
+        <div class="bar" style="height:${h}px;${i === new Date().getMonth() ? 'background:linear-gradient(to top, var(--secondary-dark), var(--secondary));' : ''}"></div>
+      </div>`;
+    }).join('');
+  }
+
+  // Load stats
+  loadDashboardStats();
+  renderPackagesAdmin();
+}
+
+async function loadDashboardStats() {
+  try {
+    const resp = await fetch('tables/bookings?limit=1000');
+    const data = await resp.json();
+    const bookings = data.data || [];
+    document.getElementById('stat-bookings').textContent = bookings.length;
+    const revenue = bookings.reduce((s, b) => s + (b.total_price || 0), 0);
+    document.getElementById('stat-revenue').textContent = 'PKR ' + revenue.toLocaleString('en-PK');
+  } catch { document.getElementById('stat-bookings').textContent = '0'; }
+
+  try {
+    const resp = await fetch('tables/contacts?limit=1000');
+    const data = await resp.json();
+    document.getElementById('stat-contacts').textContent = (data.data || []).length;
+  } catch {}
+}
+
+// ─── Packages Admin ─────────────────────────────
+function renderPackagesAdmin() {
+  const tbody = document.getElementById('packages-admin-body');
+  document.getElementById('pkg-count').textContent = PACKAGES_DATA.length;
+  tbody.innerHTML = PACKAGES_DATA.map((pkg, idx) => `
+    <tr>
+      <td><div class="pkg-thumb"><img src="${pkg.image}" alt="${pkg.title}" /></div></td>
+      <td style="font-weight:600;font-size:0.875rem;max-width:200px;">${pkg.title}</td>
+      <td><span class="admin-badge badge-blue">${pkg.category}</span></td>
+      <td style="font-size:0.82rem;">${pkg.duration}</td>
+      <td>
+        ${pkg.discount_percent > 0 ? `<div style="font-size:0.75rem;text-decoration:line-through;color:var(--gray-400);">${formatPKR(pkg.base_price)}</div>` : ''}
+        <strong style="color:var(--primary);">${formatPKR(pkg.final_price)}</strong>
+        ${pkg.discount_percent > 0 ? `<span class="admin-badge badge-red" style="margin-left:4px;">${pkg.discount_percent}% OFF</span>` : ''}
+      </td>
+      <td>${pkg.discount_percent > 0 ? `<span class="admin-badge badge-red">${pkg.discount_percent}%</span>` : '<span style="color:var(--gray-400);">None</span>'}</td>
+      <td><strong>⭐ ${pkg.rating}</strong> <span style="color:var(--text-light);font-size:0.78rem;">(${pkg.reviews_count})</span></td>
+      <td><span class="admin-badge ${pkg.featured ? 'badge-green' : 'badge-orange'}">${pkg.featured ? '✓ Yes' : 'No'}</span></td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <button class="action-btn action-view" onclick="window.open('package-detail.html?id=${pkg.id}','_blank')" title="View"><i class="fas fa-eye"></i></button>
+          <button class="action-btn action-edit" onclick="editPackage(${idx})" title="Edit"><i class="fas fa-edit"></i></button>
+          <button class="action-btn action-delete" onclick="deletePackage(${idx})" title="Delete"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openAddPackage() {
+  document.getElementById('pkg-modal-title').innerHTML = '<i class="fas fa-plus" style="color:var(--primary);margin-right:8px;"></i> Add New Package';
+  document.getElementById('pkg-save-btn-text').textContent = 'Add Package';
+  document.getElementById('f-edit-id').value = '';
+  document.getElementById('pkg-form').reset();
+  openModal('pkg-modal');
+}
+
+function editPackage(idx) {
+  const pkg = PACKAGES_DATA[idx];
+  document.getElementById('pkg-modal-title').innerHTML = '<i class="fas fa-edit" style="color:var(--primary);margin-right:8px;"></i> Edit Package';
+  document.getElementById('pkg-save-btn-text').textContent = 'Save Changes';
+  document.getElementById('f-edit-id').value = idx;
+  document.getElementById('f-title').value = pkg.title;
+  document.getElementById('f-dest').value = pkg.destination;
+  document.getElementById('f-duration').value = pkg.duration;
+  document.getElementById('f-nights').value = pkg.duration_nights;
+  document.getElementById('f-base').value = pkg.base_price;
+  document.getElementById('f-discount').value = pkg.discount_percent;
+  document.getElementById('f-final').value = pkg.final_price;
+  document.getElementById('f-cat').value = pkg.category;
+  document.getElementById('f-badge').value = pkg.badge || '';
+  document.getElementById('f-image').value = pkg.image;
+  document.getElementById('f-rating').value = pkg.rating;
+  document.getElementById('f-featured').value = pkg.featured ? 'true' : 'false';
+  document.getElementById('f-desc').value = pkg.description;
+  document.getElementById('f-highlights').value = pkg.highlights.join(', ');
+  document.getElementById('f-included').value = pkg.included.join('\n');
+  document.getElementById('f-excluded').value = pkg.excluded.join('\n');
+  openModal('pkg-modal');
+}
+
+function calcFinalPrice() {
+  const base = parseFloat(document.getElementById('f-base').value) || 0;
+  const disc = parseFloat(document.getElementById('f-discount').value) || 0;
+  document.getElementById('f-final').value = Math.round(base * (1 - disc/100));
+}
+document.getElementById('f-base')?.addEventListener('input', calcFinalPrice);
+
+function savePackage(e) {
+  e.preventDefault();
+  const editId = document.getElementById('f-edit-id').value;
+  const base = parseFloat(document.getElementById('f-base').value);
+  const disc = parseFloat(document.getElementById('f-discount').value) || 0;
+  const pkg = {
+    id: editId !== '' ? PACKAGES_DATA[parseInt(editId)].id : 'pkg-' + Date.now(),
+    title: document.getElementById('f-title').value.trim(),
+    destination: document.getElementById('f-dest').value.trim(),
+    duration: document.getElementById('f-duration').value.trim(),
+    duration_nights: parseInt(document.getElementById('f-nights').value),
+    base_price: base,
+    discount_percent: disc,
+    final_price: Math.round(base * (1 - disc/100)),
+    category: document.getElementById('f-cat').value,
+    badge: document.getElementById('f-badge').value.trim() || null,
+    image: document.getElementById('f-image').value.trim(),
+    rating: parseFloat(document.getElementById('f-rating').value) || 4.5,
+    reviews_count: editId !== '' ? PACKAGES_DATA[parseInt(editId)].reviews_count : 0,
+    featured: document.getElementById('f-featured').value === 'true',
+    description: document.getElementById('f-desc').value.trim(),
+    highlights: document.getElementById('f-highlights').value.split(',').map(h => h.trim()).filter(Boolean),
+    included: document.getElementById('f-included').value.split('\n').map(i => i.trim()).filter(Boolean),
+    excluded: document.getElementById('f-excluded').value.split('\n').map(e => e.trim()).filter(Boolean),
+    itinerary: editId !== '' ? PACKAGES_DATA[parseInt(editId)].itinerary : [],
+  };
+
+  if (editId !== '') {
+    PACKAGES_DATA[parseInt(editId)] = pkg;
+    showToast('Package Updated!', `"${pkg.title}" has been updated.`, 'success');
+  } else {
+    PACKAGES_DATA.unshift(pkg);
+    showToast('Package Added!', `"${pkg.title}" has been added.`, 'success');
+  }
+  closeModal('pkg-modal');
+  renderPackagesAdmin();
+}
+
+function deletePackage(idx) {
+  const pkg = PACKAGES_DATA[idx];
+  if (!confirm(`Delete "${pkg.title}"? This cannot be undone.`)) return;
+  PACKAGES_DATA.splice(idx, 1);
+  showToast('Deleted', `"${pkg.title}" has been removed.`, 'warning');
+  renderPackagesAdmin();
+}
+
+// ─── Bookings Admin ─────────────────────────────
+async function loadAdminBookings() {
+  const container = document.getElementById('bookings-admin-body');
+  container.innerHTML = '<div style="text-align:center;padding:30px;"><span class="loading-spinner" style="border-color:var(--gray-300);border-top-color:var(--primary);"></span></div>';
+
+  try {
+    const resp = await fetch('tables/bookings?limit=1000&sort=created_at');
+    const data = await resp.json();
+    let bookings = data.data || [];
+
+    const filterEl = document.getElementById('booking-status-filter');
+    const filterVal = filterEl ? filterEl.value : '';
+    if (filterVal) bookings = bookings.filter(b => b.status === filterVal);
+
+    if (!bookings.length) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light);"><i class="fas fa-calendar-times" style="font-size:2.5rem;color:var(--gray-300);display:block;margin-bottom:16px;"></i>No bookings found.</div>';
+      return;
+    }
+
+    container.innerHTML = `
+      <table class="admin-table" style="width:100%;">
+        <thead><tr><th>Booking ID</th><th>Package</th><th>Traveler</th><th>Date</th><th>Travelers</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${bookings.map(b => `
+            <tr>
+              <td style="font-size:0.78rem;font-weight:700;color:var(--primary);">${b.id || 'N/A'}</td>
+              <td style="font-size:0.82rem;font-weight:600;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b.package_title || 'N/A'}</td>
+              <td>
+                <div style="font-size:0.82rem;font-weight:600;">${b.user_name || 'N/A'}</div>
+                <div style="font-size:0.72rem;color:var(--text-light);">${b.user_phone || ''}</div>
+              </td>
+              <td style="font-size:0.82rem;">${b.travel_date || 'N/A'}</td>
+              <td style="text-align:center;">${b.travelers || 1}</td>
+              <td style="font-weight:700;color:var(--primary);white-space:nowrap;">PKR ${(b.total_price || 0).toLocaleString('en-PK')}</td>
+              <td>
+                <select class="filter-select" style="font-size:0.78rem;padding:5px 8px;" onchange="updateBookingStatus('${b.id}', this.value)">
+                  <option value="pending" ${b.status === 'pending' ? 'selected' : ''}>Pending</option>
+                  <option value="confirmed" ${b.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                  <option value="completed" ${b.status === 'completed' ? 'selected' : ''}>Completed</option>
+                  <option value="cancelled" ${b.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                </select>
+              </td>
+              <td>
+                <div style="display:flex;gap:4px;">
+                  <button class="action-btn action-view" onclick="viewBookingDetail(${JSON.stringify(b).replace(/"/g,'&quot;')})" title="View"><i class="fas fa-eye"></i></button>
+                  <a href="https://wa.me/${(b.user_phone||'').replace(/\D/g,'')}" target="_blank" class="action-btn" style="background:rgba(37,211,102,0.1);color:#25D366;" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+  } catch (err) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light);">Failed to load bookings. Please try again.</div>';
+  }
+}
+
+async function updateBookingStatus(id, status) {
+  try {
+    await fetch(`tables/bookings/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    showToast('Status Updated', `Booking marked as ${status}.`, 'success');
+  } catch {
+    showToast('Error', 'Failed to update status.', 'error');
+  }
+}
+
+function viewBookingDetail(b) {
+  document.getElementById('booking-detail-content').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-light);">Booking ID:</span><strong>${b.id}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-light);">Package:</span><strong>${b.package_title}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-light);">Traveler Name:</span><strong>${b.user_name}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-light);">Email:</span><strong>${b.user_email}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-light);">Phone:</span><strong>${b.user_phone}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-light);">Travel Date:</span><strong>${b.travel_date}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-light);">Travelers:</span><strong>${b.travelers}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-light);">Payment Method:</span><strong>${b.payment_method}</strong></div>
+      <div style="display:flex;justify-content:space-between;border-top:1px solid var(--gray-100);padding-top:12px;font-size:1rem;"><span style="color:var(--text-light);">Total Amount:</span><strong style="color:var(--primary);">PKR ${(b.total_price||0).toLocaleString('en-PK')}</strong></div>
+      ${b.special_requests ? `<div><div style="color:var(--text-light);margin-bottom:6px;">Special Requests:</div><div style="background:var(--gray-50);border-radius:8px;padding:12px;font-size:0.875rem;">${b.special_requests}</div></div>` : ''}
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
+      <a href="https://wa.me/${(b.user_phone||'').replace(/\D/g,'')}" target="_blank" class="btn btn-sm" style="background:#25D366;color:white;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+      <a href="mailto:${b.user_email}" class="btn btn-outline btn-sm"><i class="fas fa-envelope"></i> Email</a>
+    </div>`;
+  openModal('booking-detail-modal');
+}
+
+// ─── Contacts Admin ─────────────────────────────
+async function loadAdminContacts() {
+  const container = document.getElementById('contacts-admin-body');
+  container.innerHTML = '<div style="text-align:center;padding:30px;"><span class="loading-spinner" style="border-color:var(--gray-300);border-top-color:var(--primary);"></span></div>';
+  try {
+    const resp = await fetch('tables/contacts?limit=1000');
+    const data = await resp.json();
+    const contacts = data.data || [];
+    document.getElementById('contacts-count').textContent = contacts.filter(c => c.status === 'new').length + ' New';
+
+    if (!contacts.length) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light);">No enquiries yet.</div>';
+      return;
+    }
+    container.innerHTML = `
+      <table class="admin-table" style="width:100%;">
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Subject</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${contacts.map(c => `
+            <tr>
+              <td style="font-weight:600;">${c.name}</td>
+              <td style="font-size:0.82rem;">${c.email}</td>
+              <td style="font-size:0.82rem;">${c.phone || '-'}</td>
+              <td><span class="admin-badge badge-blue">${c.subject || 'General'}</span></td>
+              <td style="font-size:0.8rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.message}</td>
+              <td><span class="admin-badge ${c.status === 'new' ? 'badge-orange' : 'badge-green'}">${c.status || 'new'}</span></td>
+              <td>
+                <div style="display:flex;gap:4px;">
+                  <a href="mailto:${c.email}" class="action-btn action-view" title="Reply by Email"><i class="fas fa-reply"></i></a>
+                  <a href="https://wa.me/${(c.phone||'').replace(/\D/g,'')}" target="_blank" class="action-btn" style="background:rgba(37,211,102,0.1);color:#25D366;" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+  } catch { container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light);">Failed to load enquiries.</div>'; }
+}
+
+// ─── Users Admin ─────────────────────────────────
+function loadAdminUsers() {
+  const users = JSON.parse(localStorage.getItem('rt_users') || '[]');
+  const all = BookingStore.getAll();
+  document.getElementById('users-count').textContent = users.length + ' Users';
+  const tbody = document.getElementById('users-admin-body');
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-light);">No users registered yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = users.map(u => {
+    const bookings = all.filter(b => b.user_id === u.id).length;
+    return `<tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;font-weight:700;">${u.name.slice(0,2).toUpperCase()}</div>
+          <strong style="font-size:0.875rem;">${u.name}</strong>
+        </div>
+      </td>
+      <td style="font-size:0.82rem;">${u.email}</td>
+      <td style="font-size:0.82rem;color:var(--text-light);">${new Date(u.joined).toLocaleDateString()}</td>
+      <td><span class="admin-badge badge-${bookings > 0 ? 'green' : 'orange'}">${bookings} Booking${bookings !== 1 ? 's' : ''}</span></td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <a href="mailto:${u.email}" class="action-btn action-view" title="Email"><i class="fas fa-envelope"></i></a>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterAdminBookings() { loadAdminBookings(); }
+
+function saveSettings(e) {
+  e.preventDefault();
+  showToast('Settings Saved!', 'Site settings have been updated.', 'success');
+}
+
+function changeAdminPass(e) {
+  e.preventDefault();
+  const cur = document.getElementById('cur-pass').value;
+  const nw = document.getElementById('new-pass').value;
+  const cf = document.getElementById('conf-pass').value;
+  if (cur !== 'admin123') { showToast('Error', 'Current password is incorrect.', 'error'); return; }
+  if (nw !== cf) { showToast('Error', 'Passwords do not match.', 'error'); return; }
+  showToast('Password Changed!', 'Admin password updated successfully.', 'success');
+  e.target.reset();
+}
+
+// Init
+window.addEventListener('DOMContentLoaded', () => { checkAdminAccess(); });
+</script>
+</body>
+</html>

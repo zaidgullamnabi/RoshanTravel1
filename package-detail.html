@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Package Details – Roshan Travels</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .pkg-meta-bar { display:flex; align-items:center; gap:20px; flex-wrap:wrap; margin-bottom:20px; }
+    .pkg-meta-item { display:flex; align-items:center; gap:8px; font-size:0.875rem; color:var(--text-light); }
+    .pkg-meta-item i { color:var(--primary); }
+    .pkg-meta-item strong { color:var(--text-dark); }
+    .highlights-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
+    .highlight-pill { display:flex; align-items:center; gap:6px; background:var(--accent); color:var(--primary); padding:7px 14px; border-radius:var(--radius-full); font-size:0.82rem; font-weight:600; }
+    .gallery-thumbs { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:12px; }
+    .gallery-thumb { border-radius:10px; overflow:hidden; height:80px; cursor:pointer; opacity:0.7; transition:var(--transition); border:2px solid transparent; }
+    .gallery-thumb:hover,.gallery-thumb.active { opacity:1; border-color:var(--primary); }
+    .gallery-thumb img { width:100%;height:100%;object-fit:cover; }
+    .similar-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+    @media(max-width:900px){ .similar-grid{grid-template-columns:repeat(2,1fr);} }
+    @media(max-width:600px){ .similar-grid{grid-template-columns:1fr;} }
+    .price-breakdown { background:var(--gray-50); border-radius:var(--radius-md); padding:20px; margin-bottom:16px; }
+    .price-breakdown-row { display:flex; justify-content:space-between; font-size:0.875rem; padding:6px 0; border-bottom:1px dashed var(--gray-200); }
+    .price-breakdown-row:last-child { border-bottom:none; font-weight:700; font-size:1rem; color:var(--primary); }
+    .pkg-share { display:flex; gap:8px; align-items:center; }
+    .share-btn { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;cursor:pointer;transition:var(--transition); }
+    .share-fb { background:#1877f2;color:white; }
+    .share-wa { background:#25D366;color:white; }
+    .share-tw { background:#1da1f2;color:white; }
+    .share-copy { background:var(--gray-100);color:var(--text-medium); }
+    .share-btn:hover { transform:scale(1.1); }
+  </style>
+</head>
+<body>
+
+<div id="page-loader" class="page-loader">
+  <div class="loader-logo">✈ Roshan Travels</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+<div id="toast-container" class="toast-container"></div>
+<a href="https://wa.me/923001234567" target="_blank" class="whatsapp-float"><i class="fab fa-whatsapp"></i></a>
+
+<!-- NAVBAR -->
+<nav class="navbar scrolled" id="main-navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">✈</div>
+      <div class="nav-logo-text">
+        <span class="nav-logo-name">Roshan Travels</span>
+        <span class="nav-logo-tagline">Discover Pakistan</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="packages.html" class="nav-link active">Packages</a></li>
+      <li><a href="about.html" class="nav-link">About Us</a></li>
+      <li><a href="contact.html" class="nav-link">Contact</a></li>
+      <li><a href="dashboard.html" class="nav-link">My Trips</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="https://wa.me/923001234567" target="_blank" class="nav-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+      <button class="btn btn-primary btn-sm" id="nav-login-btn" onclick="openModal('auth-modal')"><i class="fas fa-user"></i> Login</button>
+      <div id="nav-user-menu" style="display:none;align-items:center;gap:10px;">
+        <a href="dashboard.html" class="btn btn-primary btn-sm"><i class="fas fa-user-circle"></i> <span id="nav-user-name"></span></a>
+        <button class="btn btn-sm" style="background:var(--gray-100);color:var(--text-medium);" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </div>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="index.html" class="nav-link">🏠 Home</a>
+  <a href="packages.html" class="nav-link active">🎒 Packages</a>
+  <a href="about.html" class="nav-link">🤝 About Us</a>
+  <a href="contact.html" class="nav-link">📞 Contact</a>
+</div>
+
+<!-- MAIN CONTENT (rendered by JS) -->
+<div id="page-content"></div>
+
+<!-- SIMILAR PACKAGES -->
+<section style="background:var(--gray-50);">
+  <div class="container">
+    <div class="section-header fade-in">
+      <span class="section-tag"><i class="fas fa-compass"></i> You May Also Like</span>
+      <h2 class="section-title">Similar Packages</h2>
+    </div>
+    <div class="similar-grid" id="similar-grid"></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" style="padding:60px 0;">
+  <div class="container">
+    <div class="cta-content">
+      <div class="cta-text"><h2>Have Questions About This Package?</h2><p>Our travel experts are available 24/7 to help you plan the perfect trip.</p></div>
+      <div class="cta-actions">
+        <a href="https://wa.me/923001234567" target="_blank" class="btn btn-secondary btn-lg"><i class="fab fa-whatsapp"></i> WhatsApp Us</a>
+        <a href="contact.html" class="btn btn-white btn-lg"><i class="fas fa-envelope"></i> Send Enquiry</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo"><div class="footer-logo-icon">✈</div><span class="footer-logo-name">Roshan Travels</span></div>
+        <p class="footer-desc">Pakistan's most trusted travel agency since 2012.</p>
+        <div class="footer-social"><a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a><a href="#" class="social-btn"><i class="fab fa-instagram"></i></a><a href="#" class="social-btn"><i class="fab fa-youtube"></i></a></div>
+      </div>
+      <div class="footer-col"><h4>Quick Links</h4><ul class="footer-links"><li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li><li><a href="packages.html"><i class="fas fa-chevron-right"></i> Packages</a></li><li><a href="about.html"><i class="fas fa-chevron-right"></i> About Us</a></li><li><a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a></li></ul></div>
+      <div class="footer-col"><h4>Popular Tours</h4><ul class="footer-links"><li><a href="package-detail.html?id=pkg-001"><i class="fas fa-chevron-right"></i> Hunza Valley</a></li><li><a href="package-detail.html?id=pkg-002"><i class="fas fa-chevron-right"></i> Skardu</a></li><li><a href="package-detail.html?id=pkg-005"><i class="fas fa-chevron-right"></i> Fairy Meadows</a></li><li><a href="package-detail.html?id=pkg-003"><i class="fas fa-chevron-right"></i> Swat Valley</a></li></ul></div>
+      <div class="footer-col"><h4>Contact Us</h4>
+        <div class="footer-contact-item"><div class="footer-contact-icon"><i class="fas fa-phone-alt"></i></div><div class="footer-contact-text">+92 300 123 4567</div></div>
+        <div class="footer-contact-item"><div class="footer-contact-icon"><i class="fas fa-envelope"></i></div><div class="footer-contact-text">info@roshantravels.pk</div></div>
+        <a href="https://wa.me/923001234567" target="_blank" class="footer-whatsapp-btn"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</a>
+      </div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 Roshan Travels. All rights reserved.</p></div>
+  </div>
+</footer>
+
+<!-- BOOKING CONFIRM MODAL -->
+<div class="modal-overlay" id="booking-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-calendar-check" style="color:var(--primary);margin-right:8px;"></i> Booking Confirmed!</h3>
+      <button class="modal-close" onclick="closeModal('booking-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="booking-confirm-body" style="text-align:center;">
+      <div style="font-size:4rem;margin-bottom:16px;">🎉</div>
+      <h3 style="margin-bottom:8px;">Your booking request has been received!</h3>
+      <p style="color:var(--text-light);margin-bottom:20px;">Our team will contact you within 2 hours to confirm your booking and payment details.</p>
+      <div id="booking-summary" style="background:var(--accent);border-radius:var(--radius-md);padding:20px;text-align:left;margin-bottom:20px;"></div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="dashboard.html" class="btn btn-primary"><i class="fas fa-list"></i> View My Bookings</a>
+        <a href="https://wa.me/923001234567" target="_blank" class="btn btn-sm" style="background:#25D366;color:white;"><i class="fab fa-whatsapp"></i> WhatsApp Us</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-user-circle" style="color:var(--primary);margin-right:8px;"></i> Login to Book</h3>
+      <button class="modal-close" onclick="closeModal('auth-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:4px;background:var(--gray-100);padding:5px;border-radius:10px;margin-bottom:24px;">
+        <button class="detail-tab active auth-tab" data-tab="login" onclick="switchAuthTab('login')" style="flex:1;">Login</button>
+        <button class="detail-tab auth-tab" data-tab="register" onclick="switchAuthTab('register')" style="flex:1;">Register</button>
+      </div>
+      <div id="auth-login" class="auth-panel">
+        <form id="login-form">
+          <div class="form-group"><label class="form-label">Email</label><input type="email" id="login-email" class="form-input" placeholder="you@example.com" required /></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" id="login-password" class="form-input" placeholder="Password" required /></div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;"><i class="fas fa-sign-in-alt"></i> Login</button>
+        </form>
+      </div>
+      <div id="auth-register" class="auth-panel" style="display:none;">
+        <form id="register-form">
+          <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="reg-name" class="form-input" required /></div>
+          <div class="form-group"><label class="form-label">Email</label><input type="email" id="reg-email" class="form-input" required /></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" id="reg-password" class="form-input" required /></div>
+          <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="reg-confirm" class="form-input" required /></div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;"><i class="fas fa-user-plus"></i> Create Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.auth-panel').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+  document.querySelector(`.auth-tab[data-tab="${tab}"]`).classList.add('active');
+  document.getElementById(`auth-${tab}`).style.display = 'block';
+}
+switchAuthTab('login');
+
+// Get package id
+const urlParams = new URLSearchParams(window.location.search);
+const pkgId = urlParams.get('id') || 'pkg-001';
+const pkg = PACKAGES_DATA.find(p => p.id === pkgId) || PACKAGES_DATA[0];
+
+// Render page
+function renderDetailPage() {
+  document.title = `${pkg.title} – Roshan Travels`;
+  const content = document.getElementById('page-content');
+
+  // Build itinerary HTML
+  const itineraryHTML = pkg.itinerary.map(d => `
+    <div class="itinerary-day">
+      <div class="itinerary-day-num">D${d.day}</div>
+      <div class="itinerary-day-content">
+        <h5>${d.title}</h5>
+        <p>${d.desc}</p>
+      </div>
+    </div>
+  `).join('');
+
+  const includedHTML = pkg.included.map(i => `<div class="included-item"><i class="fas fa-check-circle"></i> ${i}</div>`).join('');
+  const excludedHTML = pkg.excluded.map(e => `<div class="included-item excluded-item"><i class="fas fa-times-circle"></i> ${e}</div>`).join('');
+
+  const savingsAmt = pkg.base_price - pkg.final_price;
+  const taxAmt = Math.round(pkg.final_price * 0.05);
+  const totalAmt = pkg.final_price;
+
+  // Gallery images (use same image + variants for demo)
+  const galleryImages = [
+    pkg.image,
+    `https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80`,
+    `https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80`,
+    `https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80`,
+  ];
+
+  content.innerHTML = `
+  <!-- Page Hero -->
+  <div style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:130px 0 50px;position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background-size:cover;background-position:center;opacity:0.2;" style="background-image:url('${pkg.image}')"></div>
+    <div class="container" style="position:relative;z-index:1;">
+      <div class="breadcrumb">
+        <a href="index.html" style="color:rgba(255,255,255,0.7);">Home</a>
+        <span style="color:rgba(255,255,255,0.4);"><i class="fas fa-chevron-right"></i></span>
+        <a href="packages.html" style="color:rgba(255,255,255,0.7);">Packages</a>
+        <span style="color:rgba(255,255,255,0.4);"><i class="fas fa-chevron-right"></i></span>
+        <span style="color:white;">${pkg.title}</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:20px;">
+        <div>
+          <h1 style="font-family:var(--font-display);font-size:clamp(2rem,4vw,3rem);color:white;margin-bottom:12px;">${pkg.title}</h1>
+          <div class="pkg-meta-bar">
+            <span class="pkg-meta-item"><i class="fas fa-map-marker-alt"></i><strong style="color:white;">${pkg.destination}</strong></span>
+            <span class="pkg-meta-item"><i class="far fa-clock"></i><strong style="color:white;">${pkg.duration}</strong></span>
+            <span class="pkg-meta-item" style="color:var(--secondary);"><i class="fas fa-star"></i><strong>${pkg.rating}</strong> <span style="color:rgba(255,255,255,0.6);">(${pkg.reviews_count} reviews)</span></span>
+            <span class="pkg-meta-item"><i class="fas fa-tag"></i><strong style="color:white;">${pkg.category}</strong></span>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div class="pkg-share">
+            <span style="color:rgba(255,255,255,0.7);font-size:0.82rem;">Share:</span>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" class="share-btn share-fb"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://wa.me/?text=${encodeURIComponent(pkg.title + ' - ' + window.location.href)}" target="_blank" class="share-btn share-wa"><i class="fab fa-whatsapp"></i></a>
+            <button class="share-btn share-copy" onclick="navigator.clipboard.writeText(window.location.href);showToast('Link copied!','','success');" title="Copy link"><i class="fas fa-link"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Detail -->
+  <section style="padding:50px 0;" id="book">
+    <div class="container">
+      <div class="package-detail-layout">
+
+        <!-- LEFT COLUMN -->
+        <div>
+          <!-- Gallery -->
+          <div class="package-gallery">
+            <img id="main-gallery-img" src="${galleryImages[0]}" alt="${pkg.title}" />
+            ${pkg.badge ? `<span class="package-gallery-badge">${pkg.badge}</span>` : ''}
+            ${pkg.discount_percent > 0 ? `<span class="package-card-discount" style="position:absolute;top:20px;right:20px;">${pkg.discount_percent}% OFF</span>` : ''}
+          </div>
+          <div class="gallery-thumbs">
+            ${galleryImages.map((img, i) => `
+              <div class="gallery-thumb ${i===0?'active':''}" onclick="switchGallery(this, '${img}')">
+                <img src="${img}" alt="Gallery ${i+1}" loading="lazy" />
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Description -->
+          <div style="margin-top:28px;background:white;border-radius:var(--radius-lg);padding:28px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-100);">
+            <h3 style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:12px;">About This Tour</h3>
+            <p style="color:var(--text-medium);line-height:1.8;font-size:0.95rem;">${pkg.description}</p>
+          </div>
+
+          <!-- Highlights -->
+          <div style="margin-top:20px;background:white;border-radius:var(--radius-lg);padding:28px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-100);">
+            <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:16px;">✨ Tour Highlights</h3>
+            <div class="highlights-row">
+              ${pkg.highlights.map(h => `<span class="highlight-pill"><i class="fas fa-check"></i> ${h}</span>`).join('')}
+            </div>
+          </div>
+
+          <!-- Tabs -->
+          <div style="margin-top:20px;background:white;border-radius:var(--radius-lg);padding:28px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-100);">
+            <div class="detail-tabs">
+              <div class="detail-tab active" onclick="switchDetailTab('itinerary')">📅 Itinerary</div>
+              <div class="detail-tab" onclick="switchDetailTab('included')">✅ Included</div>
+              <div class="detail-tab" onclick="switchDetailTab('excluded')">❌ Excluded</div>
+            </div>
+
+            <div class="detail-panel active" id="tab-itinerary">
+              ${itineraryHTML}
+            </div>
+
+            <div class="detail-panel" id="tab-included">
+              <h4 style="margin-bottom:16px;color:var(--primary);">What's Included:</h4>
+              <div class="included-grid" style="margin-bottom:28px;">${includedHTML}</div>
+              <h4 style="margin-bottom:16px;color:var(--danger);">What's NOT Included:</h4>
+              <div class="included-grid">${excludedHTML}</div>
+            </div>
+
+            <div class="detail-panel" id="tab-excluded">
+              <div style="background:var(--accent);border-radius:var(--radius-md);padding:20px;margin-bottom:16px;">
+                <h4 style="color:var(--primary);margin-bottom:8px;"><i class="fas fa-info-circle"></i> Important Notes</h4>
+                <ul style="list-style:disc;padding-left:20px;color:var(--text-medium);font-size:0.875rem;line-height:2;">
+                  <li>Prices are per person based on double sharing</li>
+                  <li>Tour departs from Islamabad unless stated otherwise</li>
+                  <li>Minimum group size: 4 persons</li>
+                  <li>Weather conditions may affect itinerary</li>
+                  <li>Cancellation 7+ days before: 90% refund</li>
+                  <li>Cancellation 3–6 days before: 50% refund</li>
+                  <li>Cancellation less than 3 days: No refund</li>
+                </ul>
+              </div>
+              <div style="background:rgba(229,57,53,0.05);border:1px solid rgba(229,57,53,0.2);border-radius:var(--radius-md);padding:20px;">
+                <h4 style="color:var(--danger);margin-bottom:8px;"><i class="fas fa-exclamation-triangle"></i> NOT Included</h4>
+                <div class="included-grid">${excludedHTML}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reviews -->
+          <div style="margin-top:20px;background:white;border-radius:var(--radius-lg);padding:28px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-100);">
+            <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:20px;">⭐ Reviews (${pkg.reviews_count})</h3>
+            <div id="pkg-reviews"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN - BOOKING WIDGET -->
+        <div>
+          <div class="booking-widget">
+            <div class="booking-widget-header">
+              <div class="price-label">Starting from</div>
+              ${pkg.discount_percent > 0 ? `<div class="price-original">${formatPKR(pkg.base_price)}</div>` : ''}
+              <div><span class="price-main">${formatPKR(pkg.final_price)}</span> <span class="price-suffix">/ person</span></div>
+              ${pkg.discount_percent > 0 ? `<span class="price-badge">You save ${formatPKR(pkg.base_price - pkg.final_price)}!</span>` : ''}
+            </div>
+
+            <div class="booking-form">
+              <h4 style="font-family:var(--font-display);font-size:1.1rem;margin-bottom:16px;">Book This Tour</h4>
+              <form id="booking-form" onsubmit="submitBooking(event)">
+                <div class="form-group">
+                  <label class="form-label">Your Full Name *</label>
+                  <input type="text" id="b-name" class="form-input" placeholder="Ahmed Raza" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email Address *</label>
+                  <input type="email" id="b-email" class="form-input" placeholder="you@example.com" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone / WhatsApp *</label>
+                  <input type="tel" id="b-phone" class="form-input" placeholder="+92 300 123 4567" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Travel Date *</label>
+                  <input type="date" id="b-date" class="form-input" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Number of Travelers *</label>
+                  <select id="b-travelers" class="form-select" onchange="updateTotal()" required>
+                    <option value="1">1 Person</option>
+                    <option value="2" selected>2 Persons</option>
+                    <option value="3">3 Persons</option>
+                    <option value="4">4 Persons</option>
+                    <option value="5">5 Persons</option>
+                    <option value="6">6 Persons</option>
+                    <option value="7">7 Persons</option>
+                    <option value="8">8 Persons</option>
+                    <option value="10">10 Persons</option>
+                    <option value="custom">Custom Group</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Special Requests</label>
+                  <textarea id="b-notes" class="form-textarea" placeholder="Any special requirements, dietary needs, medical conditions..."></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Preferred Payment</label>
+                  <select id="b-payment" class="form-select">
+                    <option value="bank">Bank Transfer</option>
+                    <option value="easypaisa">EasyPaisa</option>
+                    <option value="jazzcash">JazzCash</option>
+                    <option value="cash">Cash on Meeting</option>
+                    <option value="installment">Installment Plan</option>
+                  </select>
+                </div>
+
+                <!-- Price Breakdown -->
+                <div class="price-breakdown">
+                  <div class="price-breakdown-row">
+                    <span>Base Price (per person)</span>
+                    <span>${formatPKR(pkg.final_price)}</span>
+                  </div>
+                  <div class="price-breakdown-row">
+                    <span>× Travelers</span>
+                    <span id="bd-travelers">× 2</span>
+                  </div>
+                  ${pkg.discount_percent > 0 ? `<div class="price-breakdown-row" style="color:var(--danger);">
+                    <span>Discount (${pkg.discount_percent}% OFF)</span>
+                    <span>Already applied</span>
+                  </div>` : ''}
+                  <div class="price-breakdown-row">
+                    <span>Service Tax (5%)</span>
+                    <span id="bd-tax">${formatPKR(Math.round(pkg.final_price * 2 * 0.05))}</span>
+                  </div>
+                  <div class="price-breakdown-row">
+                    <span>💰 TOTAL</span>
+                    <span id="bd-total">${formatPKR(pkg.final_price * 2 + Math.round(pkg.final_price * 2 * 0.05))}</span>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;margin-bottom:12px;">
+                  <i class="fas fa-calendar-check"></i> Book Now
+                </button>
+                <a href="https://wa.me/923001234567?text=I want to book ${encodeURIComponent(pkg.title)}" target="_blank"
+                   class="btn btn-sm" style="width:100%;justify-content:center;background:#25D366;color:white;">
+                  <i class="fab fa-whatsapp"></i> Book via WhatsApp
+                </a>
+              </form>
+
+              <!-- Trust badges -->
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;">
+                <div style="text-align:center;padding:10px;background:var(--gray-50);border-radius:8px;">
+                  <i class="fas fa-shield-alt" style="color:var(--primary);font-size:1.2rem;display:block;margin-bottom:4px;"></i>
+                  <span style="font-size:0.7rem;color:var(--text-light);">Secure Booking</span>
+                </div>
+                <div style="text-align:center;padding:10px;background:var(--gray-50);border-radius:8px;">
+                  <i class="fas fa-undo" style="color:var(--primary);font-size:1.2rem;display:block;margin-bottom:4px;"></i>
+                  <span style="font-size:0.7rem;color:var(--text-light);">Free Cancel</span>
+                </div>
+                <div style="text-align:center;padding:10px;background:var(--gray-50);border-radius:8px;">
+                  <i class="fas fa-headset" style="color:var(--primary);font-size:1.2rem;display:block;margin-bottom:4px;"></i>
+                  <span style="font-size:0.7rem;color:var(--text-light);">24/7 Support</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Need Help Card -->
+          <div style="background:var(--primary);border-radius:var(--radius-lg);padding:24px;margin-top:20px;text-align:center;">
+            <div style="font-size:2rem;margin-bottom:10px;">📞</div>
+            <h4 style="color:white;margin-bottom:6px;font-family:var(--font-display);">Need Help?</h4>
+            <p style="color:rgba(255,255,255,0.75);font-size:0.85rem;margin-bottom:16px;">Our experts are available 24/7</p>
+            <a href="tel:+923001234567" class="btn btn-white" style="width:100%;justify-content:center;margin-bottom:10px;">
+              <i class="fas fa-phone-alt"></i> +92 300 123 4567
+            </a>
+            <a href="https://wa.me/923001234567" target="_blank" class="btn" style="width:100%;justify-content:center;background:#25D366;color:white;">
+              <i class="fab fa-whatsapp"></i> WhatsApp Chat
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  `;
+
+  // Render reviews
+  const pkgReviews = REVIEWS_DATA.filter(r => r.package_id === pkg.id).slice(0,3);
+  const allRevs = pkgReviews.length ? pkgReviews : REVIEWS_DATA.slice(0,3);
+  document.getElementById('pkg-reviews').innerHTML = allRevs.map(rev => `
+    <div class="review-card" style="margin-bottom:16px;">
+      <div class="review-stars" style="margin-bottom:10px;">${renderStars(rev.rating)}</div>
+      <p class="review-text" style="margin-bottom:14px;">"${rev.comment}"</p>
+      <div class="review-author">
+        <div class="review-avatar" style="background:${rev.gradient}">${rev.initials}</div>
+        <div class="review-author-info"><h5>${rev.user_name}</h5><span>${rev.travel_date}</span></div>
+      </div>
+    </div>
+  `).join('');
+
+  // Set min date for travel
+  const dateInput = document.getElementById('b-date');
+  if (dateInput) {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 7);
+    dateInput.min = tomorrow.toISOString().split('T')[0];
+  }
+
+  // Pre-fill if logged in
+  const user = Auth.getUser();
+  if (user) {
+    const nameEl = document.getElementById('b-name');
+    const emailEl = document.getElementById('b-email');
+    if (nameEl) nameEl.value = user.name;
+    if (emailEl) emailEl.value = user.email;
+  }
+
+  // Similar packages
+  const similar = PACKAGES_DATA.filter(p => p.id !== pkg.id && (p.category === pkg.category || p.featured)).slice(0,3);
+  document.getElementById('similar-grid').innerHTML = similar.map(p => `
+    <div class="package-card fade-in">
+      <div class="package-card-image">
+        <img src="${p.image}" alt="${p.title}" loading="lazy" />
+        ${p.badge ? `<span class="package-card-badge">${p.badge}</span>` : ''}
+        ${p.discount_percent > 0 ? `<span class="package-card-discount">${p.discount_percent}% OFF</span>` : ''}
+      </div>
+      <div class="package-card-body">
+        <div class="package-card-meta">
+          <span class="package-card-location"><i class="fas fa-map-marker-alt"></i> ${p.destination}</span>
+          <span class="package-card-rating"><i class="fas fa-star"></i> ${p.rating}</span>
+        </div>
+        <h3 class="package-card-title">${p.title}</h3>
+        <div class="package-card-footer">
+          <span class="package-card-duration"><i class="far fa-clock"></i> ${p.duration}</span>
+          <div class="package-card-price">
+            ${p.discount_percent > 0 ? `<div class="price-original">${formatPKR(p.base_price)}</div>` : ''}
+            <div class="price-final">${formatPKR(p.final_price)}</div>
+          </div>
+        </div>
+        <div class="package-card-actions">
+          <a href="package-detail.html?id=${p.id}" class="btn btn-outline btn-sm" style="justify-content:center;">Details</a>
+          <a href="package-detail.html?id=${p.id}#book" class="btn btn-primary btn-sm" style="justify-content:center;">Book Now</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  initScrollAnimations();
+}
+
+// Gallery switch
+function switchGallery(el, src) {
+  document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const mainImg = document.getElementById('main-gallery-img');
+  mainImg.style.opacity = '0';
+  setTimeout(() => { mainImg.src = src; mainImg.style.opacity = '1'; }, 200);
+}
+
+// Detail tab switch
+function switchDetailTab(tab) {
+  document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.detail-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.detail-tab[onclick="switchDetailTab('${tab}')"]`)?.classList.add('active');
+  document.getElementById(`tab-${tab}`)?.classList.add('active');
+}
+
+// Update total price
+function updateTotal() {
+  const travelers = parseInt(document.getElementById('b-travelers').value) || 2;
+  const subtotal = pkg.final_price * travelers;
+  const tax = Math.round(subtotal * 0.05);
+  const total = subtotal + tax;
+  const el = document.getElementById('bd-travelers');
+  const taxEl = document.getElementById('bd-tax');
+  const totalEl = document.getElementById('bd-total');
+  if (el) el.textContent = `× ${travelers}`;
+  if (taxEl) taxEl.textContent = formatPKR(tax);
+  if (totalEl) totalEl.textContent = formatPKR(total);
+}
+
+// Submit booking
+async function submitBooking(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('[type=submit]');
+  btn.innerHTML = '<span class="loading-spinner"></span> Processing…';
+  btn.disabled = true;
+
+  const name = document.getElementById('b-name').value.trim();
+  const email = document.getElementById('b-email').value.trim();
+  const phone = document.getElementById('b-phone').value.trim();
+  const date = document.getElementById('b-date').value;
+  const travelers = parseInt(document.getElementById('b-travelers').value) || 2;
+  const notes = document.getElementById('b-notes').value;
+  const payment = document.getElementById('b-payment').value;
+
+  if (!name || !email || !phone || !date) {
+    showToast('Error', 'Please fill all required fields.', 'error');
+    btn.innerHTML = '<i class="fas fa-calendar-check"></i> Book Now';
+    btn.disabled = false;
+    return;
+  }
+
+  const subtotal = pkg.final_price * travelers;
+  const tax = Math.round(subtotal * 0.05);
+  const total = subtotal + tax;
+
+  const booking = {
+    package_id: pkg.id,
+    package_title: pkg.title,
+    user_name: name,
+    user_email: email,
+    user_phone: phone,
+    travel_date: date,
+    travelers,
+    total_price: total,
+    status: 'pending',
+    special_requests: notes,
+    payment_method: payment,
+    user_id: Auth.getUser()?.id || 'guest',
+  };
+
+  // Save to localStorage
+  BookingStore.add(booking);
+
+  // Save to API
+  try {
+    await fetch('tables/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...booking, id: 'BK-' + Date.now() }),
+    });
+  } catch {}
+
+  setTimeout(() => {
+    btn.innerHTML = '<i class="fas fa-calendar-check"></i> Book Now';
+    btn.disabled = false;
+
+    document.getElementById('booking-summary').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:0.875rem;"><span>Package:</span><strong>${pkg.title}</strong></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.875rem;"><span>Traveler:</span><strong>${name}</strong></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.875rem;"><span>Travel Date:</span><strong>${date}</strong></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.875rem;"><span>Travelers:</span><strong>${travelers} Person(s)</strong></div>
+        <div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:700;color:var(--primary);border-top:1px solid var(--gray-200);padding-top:8px;margin-top:4px;"><span>Total Amount:</span><span>${formatPKR(total)}</span></div>
+      </div>
+    `;
+    openModal('booking-modal');
+  }, 1200);
+}
+
+// If hash is #book, scroll to it
+if (window.location.hash === '#book') {
+  setTimeout(() => {
+    const el = document.getElementById('book');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }, 1000);
+}
+
+renderDetailPage();
+</script>
+</body>
+</html>

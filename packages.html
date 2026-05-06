@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tour Packages – Roshan Travels</title>
+  <meta name="description" content="Browse all Pakistan travel packages. Hunza, Skardu, Swat, Lahore, Fairy Meadows & more. Best prices in PKR." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .packages-header-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:16px; }
+    .results-count { font-size:0.92rem; color:var(--text-light); }
+    .results-count strong { color:var(--text-dark); }
+    .sort-bar { display:flex; align-items:center; gap:10px; }
+    .sort-label { font-size:0.85rem; color:var(--text-light); white-space:nowrap; }
+    .view-toggle { display:flex; gap:4px; }
+    .view-btn { width:36px;height:36px; border-radius:8px; background:var(--gray-100); display:flex; align-items:center; justify-content:center; color:var(--gray-400); cursor:pointer; transition:var(--transition); }
+    .view-btn.active { background:var(--primary); color:white; }
+    .packages-list .package-card { display:grid; grid-template-columns:280px 1fr; }
+    .packages-list .package-card-image { height:100%; }
+    .packages-list .package-card-actions { grid-template-columns:1fr 1fr; }
+    .no-results { text-align:center; padding:80px 20px; color:var(--text-light); }
+    .no-results i { font-size:3rem; color:var(--gray-300); margin-bottom:16px; display:block; }
+    .no-results h3 { font-size:1.2rem; margin-bottom:8px; color:var(--text-medium); }
+    .category-pills { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
+    .category-pill { padding:8px 18px; border-radius:var(--radius-full); font-size:0.82rem; font-weight:600; background:var(--gray-100); color:var(--text-medium); cursor:pointer; transition:var(--transition); border:2px solid transparent; }
+    .category-pill:hover { border-color:var(--primary); color:var(--primary); }
+    .category-pill.active { background:var(--primary); color:white; border-color:var(--primary); }
+    .price-range { display:flex; flex-direction:column; gap:8px; }
+    .price-range-labels { display:flex; justify-content:space-between; font-size:0.78rem; color:var(--text-light); }
+    .range-input { width:100%; accent-color:var(--primary); }
+    .sidebar { background:white; border-radius:var(--radius-lg); padding:24px; box-shadow:var(--shadow-sm); border:1px solid var(--gray-100); height:fit-content; position:sticky; top:calc(var(--nav-height) + 20px); }
+    .sidebar-section { margin-bottom:28px; padding-bottom:28px; border-bottom:1px solid var(--gray-100); }
+    .sidebar-section:last-child { margin-bottom:0; padding-bottom:0; border-bottom:none; }
+    .sidebar-title { font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-medium); margin-bottom:14px; }
+    .checkbox-item { display:flex; align-items:center; gap:10px; margin-bottom:10px; cursor:pointer; font-size:0.875rem; color:var(--text-medium); }
+    .checkbox-item input { accent-color:var(--primary); width:16px; height:16px; }
+    .checkbox-item:hover { color:var(--primary); }
+    .packages-with-sidebar { display:grid; grid-template-columns:260px 1fr; gap:32px; align-items:flex-start; }
+    @media(max-width:900px){ .packages-with-sidebar { grid-template-columns:1fr; } .sidebar { position:static; } .packages-list .package-card { grid-template-columns:1fr; } }
+    @media(max-width:680px){ .packages-list .package-card { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+<div id="page-loader" class="page-loader">
+  <div class="loader-logo">✈ Roshan Travels</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<a href="https://wa.me/923001234567" target="_blank" class="whatsapp-float"><i class="fab fa-whatsapp"></i></a>
+
+<!-- NAVBAR -->
+<nav class="navbar scrolled" id="main-navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">✈</div>
+      <div class="nav-logo-text">
+        <span class="nav-logo-name">Roshan Travels</span>
+        <span class="nav-logo-tagline">Discover Pakistan</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="packages.html" class="nav-link active">Packages</a></li>
+      <li><a href="about.html" class="nav-link">About Us</a></li>
+      <li><a href="contact.html" class="nav-link">Contact</a></li>
+      <li><a href="dashboard.html" class="nav-link">My Trips</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="https://wa.me/923001234567" target="_blank" class="nav-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+      <button class="btn btn-primary btn-sm" id="nav-login-btn" onclick="openModal('auth-modal')"><i class="fas fa-user"></i> Login</button>
+      <div id="nav-user-menu" style="display:none;align-items:center;gap:10px;">
+        <a href="dashboard.html" class="btn btn-primary btn-sm"><i class="fas fa-user-circle"></i> <span id="nav-user-name"></span></a>
+        <button class="btn btn-sm" style="background:var(--gray-100);color:var(--text-medium);" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </div>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="index.html" class="nav-link">🏠 Home</a>
+  <a href="packages.html" class="nav-link active">🎒 Packages</a>
+  <a href="about.html" class="nav-link">🤝 About Us</a>
+  <a href="contact.html" class="nav-link">📞 Contact</a>
+  <a href="dashboard.html" class="nav-link">📋 My Trips</a>
+</div>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="container page-hero-content">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a>
+      <span><i class="fas fa-chevron-right"></i></span>
+      <span class="active">Tour Packages</span>
+    </div>
+    <h1>🎒 Tour Packages</h1>
+    <p>Explore Pakistan's most breathtaking destinations. Every package is crafted with care, safety, and unforgettable experiences.</p>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<section style="padding:60px 0;">
+  <div class="container">
+
+    <!-- Category Pills -->
+    <div class="category-pills fade-in" id="category-pills">
+      <button class="category-pill active" data-cat="all">🌏 All Packages</button>
+      <button class="category-pill" data-cat="Northern">🏔️ Northern Pakistan</button>
+      <button class="category-pill" data-cat="Adventure">⛺ Adventure</button>
+      <button class="category-pill" data-cat="Historical">🏛️ Historical</button>
+      <button class="category-pill" data-cat="Beach">🏖️ Beach & Coast</button>
+      <button class="category-pill" data-cat="Cultural">🎭 Cultural</button>
+    </div>
+
+    <div class="packages-with-sidebar">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar fade-in">
+
+        <!-- Search -->
+        <div class="sidebar-section">
+          <div class="sidebar-title">🔍 Search</div>
+          <div class="search-field" style="background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);">
+            <i class="fas fa-search" style="color:var(--gray-400);"></i>
+            <input type="text" id="pkg-search" placeholder="Search packages..." style="background:transparent;border:none;color:var(--text-dark);font-size:0.875rem;width:100%;" />
+          </div>
+        </div>
+
+        <!-- Price Range -->
+        <div class="sidebar-section">
+          <div class="sidebar-title">💰 Price Range (PKR)</div>
+          <div class="price-range">
+            <input type="range" class="range-input" id="price-range" min="0" max="150000" step="5000" value="150000" />
+            <div class="price-range-labels">
+              <span>PKR 0</span>
+              <span id="price-display" style="font-weight:700;color:var(--primary);">PKR 1,50,000</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Duration -->
+        <div class="sidebar-section">
+          <div class="sidebar-title">⏱️ Duration</div>
+          <label class="checkbox-item"><input type="checkbox" value="short" id="dur-short"> Weekend (2–3 Days)</label>
+          <label class="checkbox-item"><input type="checkbox" value="medium" id="dur-med"> Short (4–5 Days)</label>
+          <label class="checkbox-item"><input type="checkbox" value="week" id="dur-week"> One Week (6–7 Days)</label>
+          <label class="checkbox-item"><input type="checkbox" value="long" id="dur-long"> Extended (8+ Days)</label>
+        </div>
+
+        <!-- Rating -->
+        <div class="sidebar-section">
+          <div class="sidebar-title">⭐ Minimum Rating</div>
+          <label class="checkbox-item"><input type="radio" name="rating" value="0" checked> Any Rating</label>
+          <label class="checkbox-item"><input type="radio" name="rating" value="4"> 4+ Stars</label>
+          <label class="checkbox-item"><input type="radio" name="rating" value="4.5"> 4.5+ Stars</label>
+          <label class="checkbox-item"><input type="radio" name="rating" value="4.8"> 4.8+ Stars</label>
+        </div>
+
+        <!-- Reset -->
+        <button class="btn btn-outline" style="width:100%;justify-content:center;" onclick="resetFilters()">
+          <i class="fas fa-undo"></i> Reset Filters
+        </button>
+
+        <!-- CTA -->
+        <div style="margin-top:20px;background:var(--accent);border-radius:var(--radius-md);padding:20px;text-align:center;">
+          <div style="font-size:1.5rem;margin-bottom:8px;">💬</div>
+          <h4 style="font-size:0.92rem;margin-bottom:6px;">Need Help Choosing?</h4>
+          <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:14px;">Talk to our travel experts</p>
+          <a href="https://wa.me/923001234567" target="_blank" class="btn btn-sm" style="background:#25D366;color:white;width:100%;justify-content:center;">
+            <i class="fab fa-whatsapp"></i> WhatsApp Us
+          </a>
+        </div>
+      </aside>
+
+      <!-- PACKAGES GRID -->
+      <div>
+        <div class="packages-header-row">
+          <div class="results-count">Showing <strong id="result-count">8</strong> packages</div>
+          <div class="sort-bar">
+            <span class="sort-label">Sort by:</span>
+            <select class="filter-select" id="sort-select" style="min-width:160px;">
+              <option value="featured">Featured First</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="rating">Highest Rated</option>
+              <option value="duration">Duration</option>
+            </select>
+            <div class="view-toggle">
+              <button class="view-btn active" id="grid-view-btn" onclick="setView('grid')" title="Grid View"><i class="fas fa-th-large"></i></button>
+              <button class="view-btn" id="list-view-btn" onclick="setView('list')" title="List View"><i class="fas fa-list"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="packages-grid" id="packages-container">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" style="padding:60px 0;">
+  <div class="container">
+    <div class="cta-content">
+      <div class="cta-text">
+        <h2>Can't Find What You're Looking For?</h2>
+        <p>We create 100% custom packages tailored to your dates, budget, and preferences.</p>
+      </div>
+      <div class="cta-actions">
+        <a href="contact.html" class="btn btn-secondary btn-lg"><i class="fas fa-envelope"></i> Custom Package</a>
+        <a href="https://wa.me/923001234567" target="_blank" class="btn btn-white btn-lg"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo"><div class="footer-logo-icon">✈</div><span class="footer-logo-name">Roshan Travels</span></div>
+        <p class="footer-desc">Pakistan's most trusted travel agency since 2012. Showcasing the breathtaking beauty of Pakistan to the world.</p>
+        <div class="footer-social">
+          <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-btn"><i class="fab fa-youtube"></i></a>
+          <a href="#" class="social-btn"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Quick Links</h4><ul class="footer-links"><li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li><li><a href="packages.html"><i class="fas fa-chevron-right"></i> Packages</a></li><li><a href="about.html"><i class="fas fa-chevron-right"></i> About Us</a></li><li><a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a></li></ul></div>
+      <div class="footer-col"><h4>Categories</h4><ul class="footer-links"><li><a href="packages.html?cat=Northern"><i class="fas fa-chevron-right"></i> Northern Pakistan</a></li><li><a href="packages.html?cat=Adventure"><i class="fas fa-chevron-right"></i> Adventure Tours</a></li><li><a href="packages.html?cat=Historical"><i class="fas fa-chevron-right"></i> Historical Sites</a></li><li><a href="packages.html?cat=Beach"><i class="fas fa-chevron-right"></i> Beach & Coast</a></li></ul></div>
+      <div class="footer-col"><h4>Contact Us</h4>
+        <div class="footer-contact-item"><div class="footer-contact-icon"><i class="fas fa-phone-alt"></i></div><div class="footer-contact-text">+92 300 123 4567</div></div>
+        <div class="footer-contact-item"><div class="footer-contact-icon"><i class="fas fa-envelope"></i></div><div class="footer-contact-text">info@roshantravels.pk</div></div>
+        <a href="https://wa.me/923001234567" target="_blank" class="footer-whatsapp-btn"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Roshan Travels. All rights reserved.</p>
+      <div class="footer-bottom-links"><a href="#">Privacy Policy</a><a href="#">Terms</a></div>
+    </div>
+  </div>
+</footer>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-user-circle" style="color:var(--primary);margin-right:8px;"></i> Account</h3>
+      <button class="modal-close" onclick="closeModal('auth-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:4px;background:var(--gray-100);padding:5px;border-radius:10px;margin-bottom:24px;">
+        <button class="detail-tab active auth-tab" data-tab="login" onclick="switchAuthTab('login')" style="flex:1;">Login</button>
+        <button class="detail-tab auth-tab" data-tab="register" onclick="switchAuthTab('register')" style="flex:1;">Register</button>
+      </div>
+      <div id="auth-login" class="auth-panel">
+        <form id="login-form">
+          <div class="form-group"><label class="form-label">Email</label><input type="email" id="login-email" class="form-input" placeholder="you@example.com" required /></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" id="login-password" class="form-input" placeholder="Password" required /></div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;"><i class="fas fa-sign-in-alt"></i> Login</button>
+          <div style="margin-top:10px;padding:10px;background:var(--accent);border-radius:8px;font-size:0.8rem;color:var(--primary);">Admin: admin@roshantravels.pk / admin123</div>
+        </form>
+      </div>
+      <div id="auth-register" class="auth-panel" style="display:none;">
+        <form id="register-form">
+          <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="reg-name" class="form-input" placeholder="Your Name" required /></div>
+          <div class="form-group"><label class="form-label">Email</label><input type="email" id="reg-email" class="form-input" placeholder="you@example.com" required /></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" id="reg-password" class="form-input" placeholder="Min 6 chars" required /></div>
+          <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="reg-confirm" class="form-input" placeholder="Repeat" required /></div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;"><i class="fas fa-user-plus"></i> Create Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+// Fix auth tabs
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.auth-panel').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+  document.querySelector(`.auth-tab[data-tab="${tab}"]`).classList.add('active');
+  const panel = document.getElementById(`auth-${tab}`);
+  panel.style.display = 'block';
+}
+switchAuthTab('login');
+
+let currentView = 'grid';
+let activeCategory = 'all';
+let filteredPackages = [...PACKAGES_DATA];
+
+// Parse URL params
+const urlParams = new URLSearchParams(window.location.search);
+const urlCat = urlParams.get('cat');
+const urlDest = urlParams.get('dest');
+if (urlCat) activeCategory = urlCat;
+if (urlDest) document.getElementById('pkg-search').value = urlDest;
+
+function setView(v) {
+  currentView = v;
+  const container = document.getElementById('packages-container');
+  if (v === 'grid') {
+    container.className = 'packages-grid';
+    document.getElementById('grid-view-btn').classList.add('active');
+    document.getElementById('list-view-btn').classList.remove('active');
+  } else {
+    container.className = 'packages-grid packages-list';
+    document.getElementById('list-view-btn').classList.add('active');
+    document.getElementById('grid-view-btn').classList.remove('active');
+  }
+}
+
+function getFilters() {
+  const search = document.getElementById('pkg-search').value.toLowerCase();
+  const maxPrice = parseInt(document.getElementById('price-range').value);
+  const minRating = parseFloat(document.querySelector('input[name="rating"]:checked')?.value || 0);
+  const durShort = document.getElementById('dur-short').checked;
+  const durMed = document.getElementById('dur-med').checked;
+  const durWeek = document.getElementById('dur-week').checked;
+  const durLong = document.getElementById('dur-long').checked;
+  const anyDur = !durShort && !durMed && !durWeek && !durLong;
+  const sort = document.getElementById('sort-select').value;
+  return { search, maxPrice, minRating, durShort, durMed, durWeek, durLong, anyDur, sort };
+}
+
+function filterAndRender() {
+  const f = getFilters();
+  filteredPackages = PACKAGES_DATA.filter(pkg => {
+    if (activeCategory !== 'all' && pkg.category !== activeCategory) return false;
+    if (f.search && !pkg.title.toLowerCase().includes(f.search) && !pkg.destination.toLowerCase().includes(f.search)) return false;
+    if (pkg.final_price > f.maxPrice) return false;
+    if (pkg.rating < f.minRating) return false;
+    if (!f.anyDur) {
+      const nights = pkg.duration_nights;
+      const match = (f.durShort && nights <= 3) || (f.durMed && nights >= 4 && nights <= 5)
+        || (f.durWeek && nights >= 6 && nights <= 7) || (f.durLong && nights >= 8);
+      if (!match) return false;
+    }
+    return true;
+  });
+
+  if (f.sort === 'price-asc') filteredPackages.sort((a,b) => a.final_price - b.final_price);
+  else if (f.sort === 'price-desc') filteredPackages.sort((a,b) => b.final_price - a.final_price);
+  else if (f.sort === 'rating') filteredPackages.sort((a,b) => b.rating - a.rating);
+  else if (f.sort === 'duration') filteredPackages.sort((a,b) => a.duration_nights - b.duration_nights);
+  else filteredPackages.sort((a,b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+
+  renderPackages();
+}
+
+function renderPackages() {
+  const container = document.getElementById('packages-container');
+  document.getElementById('result-count').textContent = filteredPackages.length;
+
+  if (!filteredPackages.length) {
+    container.innerHTML = `
+      <div class="no-results" style="grid-column:1/-1;">
+        <i class="fas fa-search-minus"></i>
+        <h3>No packages found</h3>
+        <p>Try adjusting your filters or <a href="contact.html" style="color:var(--primary);">contact us</a> for a custom package.</p>
+        <button class="btn btn-primary" style="margin-top:16px;" onclick="resetFilters()"><i class="fas fa-undo"></i> Reset Filters</button>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = filteredPackages.map(pkg => `
+    <div class="package-card fade-in">
+      <div class="package-card-image">
+        <img src="${pkg.image}" alt="${pkg.title}" loading="lazy" />
+        ${pkg.badge ? `<span class="package-card-badge">${pkg.badge}</span>` : ''}
+        ${pkg.discount_percent > 0 ? `<span class="package-card-discount">${pkg.discount_percent}% OFF</span>` : ''}
+        <div class="package-card-wishlist wishlist-btn" data-id="${pkg.id}"><i class="fas fa-heart"></i></div>
+      </div>
+      <div class="package-card-body">
+        <div class="package-card-meta">
+          <span class="package-card-location"><i class="fas fa-map-marker-alt"></i> ${pkg.destination}</span>
+          <span class="package-card-rating"><i class="fas fa-star"></i> ${pkg.rating} (${pkg.reviews_count})</span>
+        </div>
+        <h3 class="package-card-title">${pkg.title}</h3>
+        <p style="font-size:0.82rem;color:var(--text-light);margin-bottom:12px;line-height:1.5;">${truncate(pkg.description, 110)}</p>
+        <div class="package-card-highlights">
+          ${pkg.highlights.slice(0,3).map(h => `<span class="highlight-tag">✓ ${h}</span>`).join('')}
+        </div>
+        <div class="package-card-footer">
+          <span class="package-card-duration"><i class="far fa-clock"></i> ${pkg.duration}</span>
+          <div class="package-card-price">
+            ${pkg.discount_percent > 0 ? `<div class="price-original">${formatPKR(pkg.base_price)}</div>` : ''}
+            <div class="price-final">${formatPKR(pkg.final_price)}</div>
+            <div class="price-per">per person</div>
+          </div>
+        </div>
+        <div class="package-card-actions">
+          <a href="package-detail.html?id=${pkg.id}" class="btn btn-outline btn-sm" style="justify-content:center;"><i class="fas fa-info-circle"></i> Details</a>
+          <a href="package-detail.html?id=${pkg.id}#book" class="btn btn-primary btn-sm" style="justify-content:center;"><i class="fas fa-calendar-check"></i> Book Now</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  initWishlists();
+  initScrollAnimations();
+}
+
+function resetFilters() {
+  activeCategory = 'all';
+  document.getElementById('pkg-search').value = '';
+  document.getElementById('price-range').value = 150000;
+  document.getElementById('price-display').textContent = 'PKR 1,50,000';
+  document.getElementById('dur-short').checked = false;
+  document.getElementById('dur-med').checked = false;
+  document.getElementById('dur-week').checked = false;
+  document.getElementById('dur-long').checked = false;
+  document.querySelector('input[name="rating"][value="0"]').checked = true;
+  document.getElementById('sort-select').value = 'featured';
+  document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+  document.querySelector('.category-pill[data-cat="all"]').classList.add('active');
+  filterAndRender();
+}
+
+// Category pills
+document.querySelectorAll('.category-pill').forEach(pill => {
+  if (pill.dataset.cat === activeCategory) pill.classList.add('active');
+  else pill.classList.remove('active');
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    activeCategory = pill.dataset.cat;
+    filterAndRender();
+  });
+});
+
+// Price range live update
+document.getElementById('price-range').addEventListener('input', function() {
+  const val = parseInt(this.value);
+  document.getElementById('price-display').textContent = 'PKR ' + val.toLocaleString('en-PK');
+  filterAndRender();
+});
+
+// Search input
+let searchTimer;
+document.getElementById('pkg-search').addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(filterAndRender, 300);
+});
+
+// Sort & filters
+document.getElementById('sort-select').addEventListener('change', filterAndRender);
+document.querySelectorAll('input[name="rating"]').forEach(r => r.addEventListener('change', filterAndRender));
+['dur-short','dur-med','dur-week','dur-long'].forEach(id => {
+  document.getElementById(id).addEventListener('change', filterAndRender);
+});
+
+// Init
+filterAndRender();
+</script>
+</body>
+</html>

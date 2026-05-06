@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Dashboard – Roshan Travels</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background:var(--gray-50); }
+    .dashboard-section { padding:100px 0 60px; }
+    .not-logged { text-align:center; padding:80px 20px; background:white; border-radius:var(--radius-xl); box-shadow:var(--shadow-sm); }
+    .not-logged i { font-size:4rem; color:var(--gray-300); display:block; margin-bottom:20px; }
+    .empty-bookings { text-align:center; padding:60px 20px; color:var(--text-light); }
+    .empty-bookings i { font-size:3rem; color:var(--gray-300); display:block; margin-bottom:16px; }
+    .profile-form { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .wishlist-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+    @media(max-width:700px){ .profile-form{grid-template-columns:1fr;} .wishlist-grid{grid-template-columns:1fr;} }
+    .upcoming-banner { background:linear-gradient(135deg,var(--primary-dark),var(--primary)); border-radius:var(--radius-lg); padding:28px; color:white; display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:24px; }
+    .upcoming-banner h3 { font-family:var(--font-display); font-size:1.3rem; color:white; }
+    .upcoming-banner p { color:rgba(255,255,255,0.8); font-size:0.875rem; margin-top:4px; }
+    .booking-row-card { background:white; border-radius:var(--radius-md); padding:20px 24px; box-shadow:var(--shadow-sm); border:1px solid var(--gray-100); display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:14px; transition:var(--transition); }
+    .booking-row-card:hover { box-shadow:var(--shadow-md); border-color:var(--primary); }
+    .booking-row-image { width:80px; height:60px; border-radius:10px; overflow:hidden; flex-shrink:0; }
+    .booking-row-image img { width:100%; height:100%; object-fit:cover; }
+    .booking-row-info { flex:1; min-width:180px; }
+    .booking-row-info h4 { font-size:0.95rem; font-weight:700; margin-bottom:4px; }
+    .booking-row-info p { font-size:0.8rem; color:var(--text-light); }
+    .booking-row-price { font-weight:700; color:var(--primary); font-size:1rem; }
+    .booking-row-actions { display:flex; gap:8px; }
+    .notification-item { display:flex; align-items:flex-start; gap:14px; padding:16px; border-radius:var(--radius-md); background:white; border:1px solid var(--gray-100); margin-bottom:12px; transition:var(--transition); }
+    .notification-item:hover { border-color:var(--primary); }
+    .notif-icon { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+    .notif-content h5 { font-size:0.875rem; font-weight:700; margin-bottom:3px; }
+    .notif-content p { font-size:0.78rem; color:var(--text-light); }
+    .notif-time { font-size:0.72rem; color:var(--text-light); white-space:nowrap; }
+  </style>
+</head>
+<body>
+
+<div id="page-loader" class="page-loader">
+  <div class="loader-logo">✈ Roshan Travels</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+<div id="toast-container" class="toast-container"></div>
+<a href="https://wa.me/923001234567" target="_blank" class="whatsapp-float"><i class="fab fa-whatsapp"></i></a>
+
+<!-- NAVBAR -->
+<nav class="navbar scrolled" id="main-navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">✈</div>
+      <div class="nav-logo-text">
+        <span class="nav-logo-name">Roshan Travels</span>
+        <span class="nav-logo-tagline">Discover Pakistan</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="packages.html" class="nav-link">Packages</a></li>
+      <li><a href="about.html" class="nav-link">About Us</a></li>
+      <li><a href="contact.html" class="nav-link">Contact</a></li>
+      <li><a href="dashboard.html" class="nav-link active">My Trips</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="https://wa.me/923001234567" target="_blank" class="nav-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+      <button class="btn btn-primary btn-sm" id="nav-login-btn" onclick="openModal('auth-modal')"><i class="fas fa-user"></i> Login</button>
+      <div id="nav-user-menu" style="display:none;align-items:center;gap:10px;">
+        <span class="btn btn-primary btn-sm" style="cursor:default;"><i class="fas fa-user-circle"></i> <span id="nav-user-name"></span></span>
+        <button class="btn btn-sm" style="background:var(--gray-100);color:var(--text-medium);" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="index.html" class="nav-link">🏠 Home</a>
+  <a href="packages.html" class="nav-link">🎒 Packages</a>
+  <a href="about.html" class="nav-link">🤝 About Us</a>
+  <a href="contact.html" class="nav-link">📞 Contact</a>
+  <a href="dashboard.html" class="nav-link active">📋 My Trips</a>
+</div>
+
+<!-- MAIN DASHBOARD -->
+<section class="dashboard-section">
+  <div class="container">
+
+    <!-- NOT LOGGED IN STATE -->
+    <div id="not-logged-state" style="display:none;">
+      <div class="not-logged">
+        <i class="fas fa-user-lock"></i>
+        <h2 style="font-family:var(--font-display);margin-bottom:10px;">Please Login to Access Dashboard</h2>
+        <p style="color:var(--text-light);margin-bottom:24px;">Login or create an account to view your bookings, manage your trips, and save your favourite packages.</p>
+        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-lg" onclick="openModal('auth-modal')"><i class="fas fa-sign-in-alt"></i> Login Now</button>
+          <a href="packages.html" class="btn btn-outline btn-lg"><i class="fas fa-compass"></i> Browse Packages</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGGED IN DASHBOARD -->
+    <div id="dashboard-state" style="display:none;">
+
+      <!-- Header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div class="dashboard-avatar" style="width:60px;height:60px;font-size:1.4rem;flex-shrink:0;" id="dash-avatar">RT</div>
+          <div>
+            <h1 style="font-family:var(--font-display);font-size:1.8rem;" id="dash-welcome">Welcome back! 👋</h1>
+            <p style="color:var(--text-light);font-size:0.875rem;" id="dash-email">Loading...</p>
+          </div>
+        </div>
+        <button class="btn btn-outline" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+
+      <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+          <div class="dashboard-user">
+            <div class="dashboard-avatar" id="sidebar-avatar">RT</div>
+            <h4 id="sidebar-name">Traveler</h4>
+            <p id="sidebar-email">email@example.com</p>
+          </div>
+          <nav class="dashboard-nav">
+            <div class="dashboard-nav-item active" onclick="switchDashPanel('overview')">
+              <i class="fas fa-tachometer-alt"></i> Overview
+            </div>
+            <div class="dashboard-nav-item" onclick="switchDashPanel('bookings')">
+              <i class="fas fa-calendar-check"></i> My Bookings
+              <span id="booking-badge" style="margin-left:auto;background:var(--primary);color:white;font-size:0.7rem;padding:2px 8px;border-radius:999px;">0</span>
+            </div>
+            <div class="dashboard-nav-item" onclick="switchDashPanel('wishlist')">
+              <i class="fas fa-heart"></i> Wishlist
+            </div>
+            <div class="dashboard-nav-item" onclick="switchDashPanel('profile')">
+              <i class="fas fa-user-edit"></i> Edit Profile
+            </div>
+            <div class="dashboard-nav-item" onclick="switchDashPanel('notifications')">
+              <i class="fas fa-bell"></i> Notifications
+            </div>
+            <div class="dashboard-nav-item" style="color:var(--danger);" onclick="logout()">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </div>
+          </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div>
+
+          <!-- OVERVIEW PANEL -->
+          <div class="dashboard-panel active" id="panel-overview">
+            <!-- Stats -->
+            <div class="stats-grid" style="margin-bottom:28px;">
+              <div class="stat-card">
+                <div class="stat-card-icon green"><i class="fas fa-calendar-check"></i></div>
+                <div class="stat-card-num" id="stat-total">0</div>
+                <div class="stat-card-label">Total Bookings</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-icon orange"><i class="fas fa-clock"></i></div>
+                <div class="stat-card-num" id="stat-upcoming">0</div>
+                <div class="stat-card-label">Upcoming Trips</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-icon blue"><i class="fas fa-rupee-sign"></i></div>
+                <div class="stat-card-num" id="stat-spent" style="font-size:1.2rem;">PKR 0</div>
+                <div class="stat-card-label">Total Spent</div>
+              </div>
+            </div>
+
+            <!-- Upcoming trip banner -->
+            <div id="upcoming-banner" style="display:none;" class="upcoming-banner">
+              <div>
+                <h3>🎒 Your Trip is Coming Up!</h3>
+                <p id="upcoming-text">You have an upcoming trip. Get ready!</p>
+              </div>
+              <a href="https://wa.me/923001234567" target="_blank" class="btn btn-white btn-sm">
+                <i class="fab fa-whatsapp"></i> Contact Guide
+              </a>
+            </div>
+
+            <!-- Recent Bookings -->
+            <div style="background:white;border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-100);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+                <h3 style="font-size:1rem;font-weight:700;">Recent Bookings</h3>
+                <button class="btn btn-outline btn-sm" onclick="switchDashPanel('bookings')">View All</button>
+              </div>
+              <div id="recent-bookings-list">
+                <div class="empty-bookings">
+                  <i class="fas fa-suitcase-rolling"></i>
+                  <h3>No bookings yet!</h3>
+                  <p>Start planning your Pakistan adventure today.</p>
+                  <a href="packages.html" class="btn btn-primary" style="margin-top:16px;"><i class="fas fa-compass"></i> Browse Packages</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Explore More -->
+            <div style="margin-top:24px;background:linear-gradient(135deg,var(--primary-dark),var(--primary));border-radius:var(--radius-lg);padding:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+              <div>
+                <h3 style="color:white;font-family:var(--font-display);font-size:1.2rem;margin-bottom:6px;">Ready for Your Next Adventure? 🏔️</h3>
+                <p style="color:rgba(255,255,255,0.75);font-size:0.875rem;">Explore Pakistan's most amazing destinations</p>
+              </div>
+              <a href="packages.html" class="btn btn-secondary"><i class="fas fa-compass"></i> Browse Packages</a>
+            </div>
+          </div>
+
+          <!-- BOOKINGS PANEL -->
+          <div class="dashboard-panel" id="panel-bookings">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+              <h2 style="font-size:1.2rem;font-weight:700;"><i class="fas fa-calendar-check" style="color:var(--primary);margin-right:8px;"></i>My Bookings</h2>
+              <a href="packages.html" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Book New Trip</a>
+            </div>
+
+            <!-- Filter -->
+            <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+              <button class="filter-btn active" onclick="filterBookings('all', this)">All</button>
+              <button class="filter-btn" onclick="filterBookings('pending', this)">Pending</button>
+              <button class="filter-btn" onclick="filterBookings('confirmed', this)">Confirmed</button>
+              <button class="filter-btn" onclick="filterBookings('completed', this)">Completed</button>
+              <button class="filter-btn" onclick="filterBookings('cancelled', this)">Cancelled</button>
+            </div>
+
+            <div id="all-bookings-list">
+              <div class="empty-bookings">
+                <i class="fas fa-suitcase-rolling"></i>
+                <h3>No bookings found</h3>
+                <p>You haven't booked any trips yet.</p>
+                <a href="packages.html" class="btn btn-primary" style="margin-top:16px;"><i class="fas fa-compass"></i> Browse Packages</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- WISHLIST PANEL -->
+          <div class="dashboard-panel" id="panel-wishlist">
+            <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:20px;"><i class="fas fa-heart" style="color:var(--danger);margin-right:8px;"></i>My Wishlist</h2>
+            <div id="wishlist-grid" class="wishlist-grid">
+              <div class="empty-bookings" style="grid-column:1/-1;">
+                <i class="fas fa-heart"></i>
+                <h3>Your wishlist is empty</h3>
+                <p>Save packages by clicking the ❤ button on any tour.</p>
+                <a href="packages.html" class="btn btn-primary" style="margin-top:16px;"><i class="fas fa-compass"></i> Browse Packages</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- PROFILE PANEL -->
+          <div class="dashboard-panel" id="panel-profile">
+            <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:24px;"><i class="fas fa-user-edit" style="color:var(--primary);margin-right:8px;"></i>Edit Profile</h2>
+            <div style="background:white;border-radius:var(--radius-lg);padding:28px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-100);">
+              <!-- Avatar -->
+              <div style="text-align:center;margin-bottom:28px;">
+                <div class="dashboard-avatar" style="width:90px;height:90px;font-size:2rem;margin:0 auto 12px;" id="profile-avatar">RT</div>
+                <h3 style="font-size:1rem;font-weight:700;" id="profile-name-display">Traveler</h3>
+                <p style="color:var(--text-light);font-size:0.82rem;" id="profile-email-display">email</p>
+                <span style="display:inline-block;background:var(--accent);color:var(--primary);font-size:0.72rem;font-weight:700;padding:4px 14px;border-radius:999px;margin-top:8px;">Member Since 2025</span>
+              </div>
+              <form id="profile-form" onsubmit="saveProfile(event)">
+                <div class="profile-form">
+                  <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="p-name" class="form-input" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="p-email" class="form-input" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Phone / WhatsApp</label>
+                    <input type="tel" id="p-phone" class="form-input" placeholder="+92 300 123 4567" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">City</label>
+                    <input type="text" id="p-city" class="form-input" placeholder="Islamabad" />
+                  </div>
+                  <div class="form-group" style="grid-column:1/-1;">
+                    <label class="form-label">Travel Preferences</label>
+                    <select id="p-pref" class="form-select">
+                      <option value="">Select preference</option>
+                      <option value="adventure">Adventure & Trekking</option>
+                      <option value="family">Family Vacations</option>
+                      <option value="cultural">Cultural & Historical</option>
+                      <option value="honeymoon">Honeymoon / Couple</option>
+                      <option value="solo">Solo Travel</option>
+                    </select>
+                  </div>
+                </div>
+                <div style="margin-top:8px;">
+                  <label class="form-label">New Password (leave blank to keep current)</label>
+                  <input type="password" id="p-password" class="form-input" placeholder="Enter new password" />
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top:20px;"><i class="fas fa-save"></i> Save Profile</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- NOTIFICATIONS PANEL -->
+          <div class="dashboard-panel" id="panel-notifications">
+            <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:20px;"><i class="fas fa-bell" style="color:var(--secondary-dark);margin-right:8px;"></i>Notifications</h2>
+            <div id="notifications-list">
+              <div class="notification-item">
+                <div class="notif-icon" style="background:var(--accent);color:var(--primary);"><i class="fas fa-check-circle"></i></div>
+                <div class="notif-content" style="flex:1;">
+                  <h5>Welcome to Roshan Travels!</h5>
+                  <p>Your account has been created. Explore our amazing Pakistan tour packages.</p>
+                </div>
+                <div class="notif-time">Just now</div>
+              </div>
+              <div class="notification-item">
+                <div class="notif-icon" style="background:rgba(244,166,35,0.15);color:var(--secondary-dark);"><i class="fas fa-tag"></i></div>
+                <div class="notif-content" style="flex:1;">
+                  <h5>🔥 Limited Offer: Swat Valley 20% OFF</h5>
+                  <p>Book the Swat Valley package before June 30 to get 20% discount. Only 5 spots left!</p>
+                </div>
+                <div class="notif-time">2h ago</div>
+              </div>
+              <div class="notification-item">
+                <div class="notif-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;"><i class="fas fa-info-circle"></i></div>
+                <div class="notif-content" style="flex:1;">
+                  <h5>New Package: Fairy Meadows Autumn Trip</h5>
+                  <p>We just launched a new autumn package to Fairy Meadows. Check it out!</p>
+                </div>
+                <div class="notif-time">1d ago</div>
+              </div>
+              <div class="notification-item">
+                <div class="notif-icon" style="background:rgba(26,107,60,0.1);color:var(--primary);"><i class="fas fa-star"></i></div>
+                <div class="notif-content" style="flex:1;">
+                  <h5>Rate Your Last Trip</h5>
+                  <p>How was your experience? Share a review and help others plan their trips.</p>
+                </div>
+                <div class="notif-time">3d ago</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end main content -->
+      </div><!-- end dashboard-layout -->
+    </div><!-- end dashboard-state -->
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo"><div class="footer-logo-icon">✈</div><span class="footer-logo-name">Roshan Travels</span></div>
+        <p class="footer-desc">Pakistan's most trusted travel agency since 2012.</p>
+        <div class="footer-social"><a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a><a href="#" class="social-btn"><i class="fab fa-instagram"></i></a><a href="#" class="social-btn"><i class="fab fa-youtube"></i></a></div>
+      </div>
+      <div class="footer-col"><h4>Quick Links</h4><ul class="footer-links"><li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li><li><a href="packages.html"><i class="fas fa-chevron-right"></i> Packages</a></li><li><a href="about.html"><i class="fas fa-chevron-right"></i> About Us</a></li><li><a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a></li></ul></div>
+      <div class="footer-col"><h4>My Account</h4><ul class="footer-links"><li><a href="#" onclick="switchDashPanel('bookings')"><i class="fas fa-chevron-right"></i> My Bookings</a></li><li><a href="#" onclick="switchDashPanel('wishlist')"><i class="fas fa-chevron-right"></i> Wishlist</a></li><li><a href="#" onclick="switchDashPanel('profile')"><i class="fas fa-chevron-right"></i> Profile</a></li></ul></div>
+      <div class="footer-col"><h4>Contact Us</h4>
+        <div class="footer-contact-item"><div class="footer-contact-icon"><i class="fas fa-phone-alt"></i></div><div class="footer-contact-text">+92 300 123 4567</div></div>
+        <a href="https://wa.me/923001234567" target="_blank" class="footer-whatsapp-btn"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</a>
+      </div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 Roshan Travels. All rights reserved.</p></div>
+  </div>
+</footer>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-user-circle" style="color:var(--primary);margin-right:8px;"></i> Login to Dashboard</h3>
+      <button class="modal-close" onclick="closeModal('auth-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:4px;background:var(--gray-100);padding:5px;border-radius:10px;margin-bottom:24px;">
+        <button class="detail-tab active auth-tab" data-tab="login" onclick="switchAuthTab('login')" style="flex:1;">Login</button>
+        <button class="detail-tab auth-tab" data-tab="register" onclick="switchAuthTab('register')" style="flex:1;">Register</button>
+      </div>
+      <div id="auth-login">
+        <form id="login-form">
+          <div class="form-group"><label class="form-label">Email</label><input type="email" id="login-email" class="form-input" placeholder="you@example.com" required /></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" id="login-password" class="form-input" placeholder="Password" required /></div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;"><i class="fas fa-sign-in-alt"></i> Login</button>
+          <div style="margin-top:10px;padding:10px;background:var(--accent);border-radius:8px;font-size:0.8rem;color:var(--primary);">Admin: admin@roshantravels.pk / admin123</div>
+        </form>
+      </div>
+      <div id="auth-register" style="display:none;">
+        <form id="register-form">
+          <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="reg-name" class="form-input" required /></div>
+          <div class="form-group"><label class="form-label">Email</label><input type="email" id="reg-email" class="form-input" required /></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" id="reg-password" class="form-input" required /></div>
+          <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="reg-confirm" class="form-input" required /></div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;"><i class="fas fa-user-plus"></i> Create Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('auth-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('auth-register').style.display = tab === 'register' ? 'block' : 'none';
+  document.querySelector(`.auth-tab[data-tab="${tab}"]`).classList.add('active');
+}
+
+// Override logout to reload page
+function logout() {
+  Auth.logout();
+  showToast('Logged out', 'See you next time! ✈️');
+  setTimeout(() => location.reload(), 600);
+}
+
+// Override auth success to reload
+const _origLogin = Auth.login.bind(Auth);
+
+// Init dashboard
+function initDashboard() {
+  const user = Auth.getUser();
+  if (!user) {
+    document.getElementById('not-logged-state').style.display = 'block';
+    document.getElementById('dashboard-state').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('not-logged-state').style.display = 'none';
+  document.getElementById('dashboard-state').style.display = 'block';
+
+  // Populate user info
+  const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('dash-avatar').textContent = initials;
+  document.getElementById('dash-welcome').textContent = `Welcome back, ${user.name.split(' ')[0]}! 👋`;
+  document.getElementById('dash-email').textContent = user.email;
+  document.getElementById('sidebar-avatar').textContent = initials;
+  document.getElementById('sidebar-name').textContent = user.name;
+  document.getElementById('sidebar-email').textContent = user.email;
+  document.getElementById('profile-avatar').textContent = initials;
+  document.getElementById('profile-name-display').textContent = user.name;
+  document.getElementById('profile-email-display').textContent = user.email;
+  document.getElementById('p-name').value = user.name;
+  document.getElementById('p-email').value = user.email;
+
+  // Load bookings
+  const bookings = BookingStore.getUserBookings(user.id);
+  document.getElementById('booking-badge').textContent = bookings.length;
+
+  // Stats
+  document.getElementById('stat-total').textContent = bookings.length;
+  const upcoming = bookings.filter(b => b.status !== 'cancelled' && b.status !== 'completed');
+  document.getElementById('stat-upcoming').textContent = upcoming.length;
+  const totalSpent = bookings.reduce((sum, b) => sum + (b.total_price || 0), 0);
+  document.getElementById('stat-spent').textContent = 'PKR ' + totalSpent.toLocaleString('en-PK');
+
+  // Upcoming banner
+  if (upcoming.length > 0) {
+    const next = upcoming[0];
+    document.getElementById('upcoming-banner').style.display = 'flex';
+    document.getElementById('upcoming-text').textContent = `${next.package_title} — ${next.travel_date} (${next.travelers} travelers)`;
+  }
+
+  // Recent bookings (overview)
+  renderBookingList('recent-bookings-list', bookings.slice(0,3));
+  // All bookings
+  renderBookingList('all-bookings-list', bookings);
+  // Wishlist
+  renderWishlist();
+}
+
+function renderBookingList(containerId, bookings) {
+  const container = document.getElementById(containerId);
+  if (!bookings.length) {
+    container.innerHTML = `<div class="empty-bookings"><i class="fas fa-suitcase-rolling"></i><h3>No bookings yet!</h3><p>Start planning your Pakistan adventure.</p><a href="packages.html" class="btn btn-primary" style="margin-top:16px;"><i class="fas fa-compass"></i> Browse Packages</a></div>`;
+    return;
+  }
+  container.innerHTML = bookings.map(b => {
+    const pkg = PACKAGES_DATA.find(p => p.id === b.package_id) || {};
+    const statusColors = { pending:'status-pending', confirmed:'status-confirmed', cancelled:'status-cancelled', completed:'status-completed' };
+    return `
+    <div class="booking-row-card">
+      <div class="booking-row-image">
+        <img src="${pkg.image || 'https://images.unsplash.com/photo-1586348943529-beaae6c28db9?w=200&q=60'}" alt="${b.package_title}" />
+      </div>
+      <div class="booking-row-info">
+        <h4>${b.package_title}</h4>
+        <p><i class="fas fa-calendar-alt" style="margin-right:4px;"></i> ${b.travel_date} &nbsp;•&nbsp; <i class="fas fa-users" style="margin-right:4px;"></i> ${b.travelers} travelers</p>
+      </div>
+      <span class="status-badge ${statusColors[b.status] || 'status-pending'}">${b.status}</span>
+      <div class="booking-row-price">PKR ${(b.total_price||0).toLocaleString('en-PK')}</div>
+      <div class="booking-row-actions">
+        <a href="package-detail.html?id=${b.package_id}" class="action-btn action-view" title="View Package"><i class="fas fa-eye"></i></a>
+        ${b.status === 'pending' ? `<button class="action-btn action-delete" onclick="cancelBooking('${b.id}')" title="Cancel"><i class="fas fa-times"></i></button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderWishlist() {
+  const wishIds = Wishlist.get();
+  const grid = document.getElementById('wishlist-grid');
+  if (!wishIds.length) {
+    grid.innerHTML = `<div class="empty-bookings" style="grid-column:1/-1;"><i class="fas fa-heart"></i><h3>Wishlist is empty</h3><p>Save packages by clicking ❤ on any tour.</p><a href="packages.html" class="btn btn-primary" style="margin-top:16px;">Browse Packages</a></div>`;
+    return;
+  }
+  const wishPkgs = PACKAGES_DATA.filter(p => wishIds.includes(p.id));
+  grid.innerHTML = wishPkgs.map(pkg => `
+    <div class="package-card">
+      <div class="package-card-image">
+        <img src="${pkg.image}" alt="${pkg.title}" loading="lazy" />
+        ${pkg.badge ? `<span class="package-card-badge">${pkg.badge}</span>` : ''}
+        <div class="package-card-wishlist active" onclick="removeWishlist('${pkg.id}', this)" title="Remove"><i class="fas fa-heart"></i></div>
+      </div>
+      <div class="package-card-body">
+        <div class="package-card-meta">
+          <span class="package-card-location"><i class="fas fa-map-marker-alt"></i> ${pkg.destination}</span>
+          <span class="package-card-rating"><i class="fas fa-star"></i> ${pkg.rating}</span>
+        </div>
+        <h3 class="package-card-title">${pkg.title}</h3>
+        <div class="package-card-footer">
+          <span class="package-card-duration"><i class="far fa-clock"></i> ${pkg.duration}</span>
+          <div class="package-card-price">
+            ${pkg.discount_percent > 0 ? `<div class="price-original">${formatPKR(pkg.base_price)}</div>` : ''}
+            <div class="price-final">${formatPKR(pkg.final_price)}</div>
+          </div>
+        </div>
+        <div class="package-card-actions">
+          <a href="package-detail.html?id=${pkg.id}" class="btn btn-outline btn-sm" style="justify-content:center;">Details</a>
+          <a href="package-detail.html?id=${pkg.id}#book" class="btn btn-primary btn-sm" style="justify-content:center;">Book Now</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function removeWishlist(id, btn) {
+  Wishlist.toggle(id);
+  renderWishlist();
+  showToast('Removed from Wishlist', '', 'warning');
+}
+
+function cancelBooking(id) {
+  if (!confirm('Are you sure you want to cancel this booking?')) return;
+  BookingStore.cancel(id);
+  showToast('Booking Cancelled', 'Your booking has been cancelled.', 'warning');
+  initDashboard();
+}
+
+function filterBookings(status, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const user = Auth.getUser();
+  if (!user) return;
+  let bookings = BookingStore.getUserBookings(user.id);
+  if (status !== 'all') bookings = bookings.filter(b => b.status === status);
+  renderBookingList('all-bookings-list', bookings);
+}
+
+function switchDashPanel(panel) {
+  document.querySelectorAll('.dashboard-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.dashboard-nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`panel-${panel}`)?.classList.add('active');
+  const navItems = document.querySelectorAll('.dashboard-nav-item');
+  navItems.forEach(item => {
+    if (item.getAttribute('onclick')?.includes(panel)) item.classList.add('active');
+  });
+}
+
+function saveProfile(e) {
+  e.preventDefault();
+  const user = Auth.getUser();
+  if (!user) return;
+  const updated = {
+    ...user,
+    name: document.getElementById('p-name').value,
+    email: document.getElementById('p-email').value,
+  };
+  Auth.setUser(updated);
+  showToast('Profile Updated!', 'Your profile has been saved.', 'success');
+  initDashboard();
+}
+
+// After login, reload
+document.addEventListener('authSuccess', () => {
+  closeModal('auth-modal');
+  initDashboard();
+});
+
+// Watch for login form submit - override to refresh dashboard
+window.addEventListener('DOMContentLoaded', () => {
+  const lf = document.getElementById('login-form');
+  if (lf) {
+    lf.addEventListener('submit', e => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const result = Auth.login(email, password);
+      if (result.ok) {
+        closeModal('auth-modal');
+        showToast('Welcome!', `Logged in successfully.`);
+        if (result.isAdmin) { setTimeout(() => window.location.href = 'admin.html', 500); return; }
+        setTimeout(() => initDashboard(), 300);
+        updateNavAuth();
+      } else {
+        showToast('Error', result.msg, 'error');
+      }
+    });
+  }
+  const rf = document.getElementById('register-form');
+  if (rf) {
+    rf.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const pass = document.getElementById('reg-password').value;
+      const conf = document.getElementById('reg-confirm').value;
+      if (pass !== conf) { showToast('Error', 'Passwords do not match.', 'error'); return; }
+      const result = Auth.register(name, email, pass);
+      if (result.ok) {
+        closeModal('auth-modal');
+        showToast('Welcome!', `Account created! 🎉`);
+        setTimeout(() => initDashboard(), 300);
+        updateNavAuth();
+      } else {
+        showToast('Error', result.msg, 'error');
+      }
+    });
+  }
+  initDashboard();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roshan Travels – Discover Pakistan's Hidden Wonders</title>
+  <meta name="description" content="Pakistan's premier travel agency. Explore Hunza, Skardu, Swat, Lahore & more. Book your dream Pakistan tour with Roshan Travels." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- PAGE LOADER -->
+<div id="page-loader" class="page-loader">
+  <div class="loader-logo">✈ Roshan Travels</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- WHATSAPP FLOAT -->
+<a href="https://wa.me/923001234567?text=Hello!%20I%20want%20to%20book%20a%20tour." target="_blank" class="whatsapp-float" title="Chat on WhatsApp">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
+<!-- ═══════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════ -->
+<nav class="navbar transparent" id="main-navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">✈</div>
+      <div class="nav-logo-text">
+        <span class="nav-logo-name">Roshan Travels</span>
+        <span class="nav-logo-tagline">Discover Pakistan</span>
+      </div>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link active">Home</a></li>
+      <li><a href="packages.html" class="nav-link">Packages</a></li>
+      <li><a href="about.html" class="nav-link">About Us</a></li>
+      <li><a href="contact.html" class="nav-link">Contact</a></li>
+      <li><a href="dashboard.html" class="nav-link">My Trips</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <a href="https://wa.me/923001234567" target="_blank" class="nav-whatsapp">
+        <i class="fab fa-whatsapp"></i> WhatsApp
+      </a>
+      <button class="btn btn-white btn-sm" id="nav-login-btn" onclick="openModal('auth-modal')">
+        <i class="fas fa-user"></i> Login
+      </button>
+      <div id="nav-user-menu" style="display:none; align-items:center; gap:10px;">
+        <a href="dashboard.html" class="btn btn-white btn-sm">
+          <i class="fas fa-user-circle"></i> <span id="nav-user-name"></span>
+        </a>
+        <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white;" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </div>
+
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobile-menu">
+  <a href="index.html" class="nav-link active">🏠 Home</a>
+  <a href="packages.html" class="nav-link">🎒 Packages</a>
+  <a href="about.html" class="nav-link">🤝 About Us</a>
+  <a href="contact.html" class="nav-link">📞 Contact</a>
+  <a href="dashboard.html" class="nav-link">📋 My Trips</a>
+  <div style="margin-top:12px; display:flex; gap:10px;">
+    <button class="btn btn-primary btn-sm" onclick="openModal('auth-modal'); document.getElementById('mobile-menu').classList.remove('open');">
+      <i class="fas fa-user"></i> Login / Register
+    </button>
+    <a href="https://wa.me/923001234567" target="_blank" class="btn btn-sm" style="background:#25D366;color:white;">
+      <i class="fab fa-whatsapp"></i> WhatsApp
+    </a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     HERO SECTION
+════════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="hero-bg" id="hero-bg"></div>
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content">
+    <!-- Left Text -->
+    <div class="hero-text">
+      <div class="hero-badge">
+        <i class="fas fa-map-marker-alt"></i> Pakistan's #1 Travel Agency
+      </div>
+      <h1 class="hero-title" id="hero-title" style="transition: all 0.4s ease;">
+        Discover <span>Hunza Valley</span>
+      </h1>
+      <p class="hero-desc" id="hero-desc">
+        Journey to the Crown Jewel of Karakoram — where turquoise lakes meet snow-capped peaks in the most spectacular landscape on Earth.
+      </p>
+      <div class="hero-cta">
+        <a href="packages.html" class="btn btn-secondary btn-lg">
+          <i class="fas fa-compass"></i> Explore Packages
+        </a>
+        <a href="about.html" class="btn btn-white btn-lg">
+          <i class="fas fa-play-circle"></i> Our Story
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-num">5,000+</span>
+          <span class="hero-stat-label">Happy Travelers</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">50+</span>
+          <span class="hero-stat-label">Destinations</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">12+</span>
+          <span class="hero-stat-label">Years Experience</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Search Card -->
+    <div class="hero-search-card">
+      <h3><i class="fas fa-search" style="color:var(--secondary);margin-right:8px;"></i>Find Your Perfect Trip</h3>
+      <form class="search-form" id="hero-search-form">
+        <div class="search-field">
+          <i class="fas fa-map-marker-alt"></i>
+          <input type="text" id="search-dest" placeholder="Where do you want to go?" autocomplete="off" list="dest-suggestions" />
+          <datalist id="dest-suggestions">
+            <option value="Hunza Valley">
+            <option value="Skardu">
+            <option value="Swat Valley">
+            <option value="Lahore">
+            <option value="Fairy Meadows">
+            <option value="Murree">
+            <option value="Gwadar">
+            <option value="Nathia Gali">
+          </datalist>
+        </div>
+        <div class="search-row">
+          <div class="search-field">
+            <i class="fas fa-calendar-alt"></i>
+            <input type="date" id="search-date" />
+          </div>
+          <div class="search-field">
+            <i class="fas fa-users"></i>
+            <input type="number" id="search-travelers" placeholder="Travelers" min="1" max="50" />
+          </div>
+        </div>
+        <div class="search-field">
+          <i class="fas fa-wallet"></i>
+          <select id="search-budget">
+            <option value="">Select Budget Range</option>
+            <option value="economy">Economy (Under PKR 30,000)</option>
+            <option value="standard">Standard (PKR 30,000–60,000)</option>
+            <option value="premium">Premium (PKR 60,000–100,000)</option>
+            <option value="luxury">Luxury (PKR 100,000+)</option>
+          </select>
+        </div>
+        <div class="search-field">
+          <i class="fas fa-clock"></i>
+          <select id="search-duration">
+            <option value="">Trip Duration</option>
+            <option value="3">Weekend (2–3 Days)</option>
+            <option value="5">Short Trip (4–5 Days)</option>
+            <option value="7">One Week (6–7 Days)</option>
+            <option value="10">Extended (8+ Days)</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-secondary" style="width:100%; justify-content:center;">
+          <i class="fas fa-search"></i> Search Packages
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Slider Dots -->
+  <div class="hero-dots" id="hero-dots"></div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     FEATURES STRIP
+════════════════════════════════════════ -->
+<div class="features-strip">
+  <div class="features-strip-inner">
+    <div class="feature-strip-item">
+      <div class="feature-strip-icon"><i class="fas fa-shield-alt"></i></div>
+      <div class="feature-strip-text">
+        <h4>100% Safe & Secure</h4>
+        <p>Verified & trusted tours</p>
+      </div>
+    </div>
+    <div class="feature-strip-item">
+      <div class="feature-strip-icon"><i class="fas fa-tag"></i></div>
+      <div class="feature-strip-text">
+        <h4>Best Price Guarantee</h4>
+        <p>No hidden charges</p>
+      </div>
+    </div>
+    <div class="feature-strip-item">
+      <div class="feature-strip-icon"><i class="fas fa-headset"></i></div>
+      <div class="feature-strip-text">
+        <h4>24/7 Support</h4>
+        <p>Always here for you</p>
+      </div>
+    </div>
+    <div class="feature-strip-item">
+      <div class="feature-strip-icon"><i class="fas fa-undo"></i></div>
+      <div class="feature-strip-text">
+        <h4>Easy Cancellation</h4>
+        <p>Flexible booking policy</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     FEATURED PACKAGES
+════════════════════════════════════════ -->
+<section id="featured-packages">
+  <div class="container">
+    <div class="section-header fade-in">
+      <span class="section-tag"><i class="fas fa-fire"></i> Hot Deals</span>
+      <h2 class="section-title">Featured Tour Packages</h2>
+      <p class="section-subtitle">Hand-picked journeys across Pakistan's most spectacular destinations — from icy peaks to ancient ruins.</p>
+    </div>
+
+    <div class="packages-grid" id="featured-packages-grid">
+      <!-- Rendered by JS -->
+    </div>
+
+    <div style="text-align:center; margin-top:48px;" class="fade-in">
+      <a href="packages.html" class="btn btn-primary btn-lg">
+        <i class="fas fa-th-large"></i> View All Packages
+        <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     DESTINATIONS
+════════════════════════════════════════ -->
+<section style="background: var(--gray-50);">
+  <div class="container">
+    <div class="section-header fade-in">
+      <span class="section-tag"><i class="fas fa-map"></i> Top Destinations</span>
+      <h2 class="section-title">Explore Pakistan's Wonders</h2>
+      <p class="section-subtitle">From the world's highest roads to ancient civilizations — Pakistan has it all.</p>
+    </div>
+
+    <div class="destinations-grid fade-in" id="destinations-grid">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     STATS / COUNTER
+════════════════════════════════════════ -->
+<section id="counter-section" style="background: linear-gradient(135deg, var(--primary-dark), var(--primary)); padding: 60px 0;">
+  <div class="container">
+    <div style="display:grid; grid-template-columns: repeat(4,1fr); gap:30px; text-align:center;">
+      <div class="fade-in">
+        <div style="font-family:var(--font-display);font-size:3rem;font-weight:700;color:var(--secondary);" data-count="5000" data-suffix="+">0+</div>
+        <div style="color:rgba(255,255,255,0.8);margin-top:6px;font-size:0.95rem;">Happy Travelers</div>
+      </div>
+      <div class="fade-in">
+        <div style="font-family:var(--font-display);font-size:3rem;font-weight:700;color:var(--secondary);" data-count="50" data-suffix="+">0+</div>
+        <div style="color:rgba(255,255,255,0.8);margin-top:6px;font-size:0.95rem;">Destinations</div>
+      </div>
+      <div class="fade-in">
+        <div style="font-family:var(--font-display);font-size:3rem;font-weight:700;color:var(--secondary);" data-count="12" data-suffix=" Yrs">0 Yrs</div>
+        <div style="color:rgba(255,255,255,0.8);margin-top:6px;font-size:0.95rem;">Experience</div>
+      </div>
+      <div class="fade-in">
+        <div style="font-family:var(--font-display);font-size:3rem;font-weight:700;color:var(--secondary);" data-count="4.9" data-suffix="★">0★</div>
+        <div style="color:rgba(255,255,255,0.8);margin-top:6px;font-size:0.95rem;">Average Rating</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     WHY CHOOSE US
+════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-header center fade-in">
+      <span class="section-tag"><i class="fas fa-star"></i> Why Us</span>
+      <h2 class="section-title">Why Choose Roshan Travels?</h2>
+      <p class="section-subtitle">We don't just sell tours — we craft unforgettable memories that last a lifetime.</p>
+    </div>
+    <div class="why-us-grid">
+      <div class="why-card fade-in">
+        <div class="why-icon"><i class="fas fa-map-marked-alt"></i></div>
+        <h4>Expert Local Guides</h4>
+        <p>Our certified mountain guides know every hidden gem, secret trail, and breathtaking viewpoint in Pakistan.</p>
+      </div>
+      <div class="why-card fade-in">
+        <div class="why-icon"><i class="fas fa-rupee-sign"></i></div>
+        <h4>Best PKR Prices</h4>
+        <p>All prices in Pakistani Rupees. No foreign currency confusion. Transparent pricing with no hidden charges ever.</p>
+      </div>
+      <div class="why-card fade-in">
+        <div class="why-icon"><i class="fas fa-shield-alt"></i></div>
+        <h4>Safety First</h4>
+        <p>All routes are thoroughly planned with safety checkpoints, emergency contacts, and first-aid trained guides.</p>
+      </div>
+      <div class="why-card fade-in">
+        <div class="why-icon"><i class="fas fa-hotel"></i></div>
+        <h4>Handpicked Stays</h4>
+        <p>From cozy mountain guesthouses to luxury resorts — we only partner with verified, quality accommodations.</p>
+      </div>
+      <div class="why-card fade-in">
+        <div class="why-icon"><i class="fas fa-heart"></i></div>
+        <h4>Personalized Experience</h4>
+        <p>Every trip is tailored to your needs. Honeymoon? Family? Solo? Corporate? We have the perfect package.</p>
+      </div>
+      <div class="why-card fade-in">
+        <div class="why-icon"><i class="fas fa-headset"></i></div>
+        <h4>24/7 Support</h4>
+        <p>Our team is available round the clock via WhatsApp and phone — before, during, and after your trip.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     CUSTOMER REVIEWS
+════════════════════════════════════════ -->
+<section class="reviews-section">
+  <div class="container">
+    <div class="section-header center fade-in">
+      <span class="section-tag"><i class="fas fa-quote-left"></i> Testimonials</span>
+      <h2 class="section-title">What Our Travelers Say</h2>
+      <p class="section-subtitle">Real stories from real adventurers who explored Pakistan with us.</p>
+    </div>
+    <div class="reviews-slider" id="reviews-grid">
+      <!-- Rendered by JS -->
+    </div>
+    <!-- Overall Rating -->
+    <div class="fade-in" style="text-align:center; margin-top:48px; display:flex; align-items:center; justify-content:center; gap:24px; flex-wrap:wrap;">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+        <div style="font-family:var(--font-display); font-size:3.5rem; font-weight:700; color:var(--primary); line-height:1;">4.9</div>
+        <div style="display:flex; gap:4px; font-size:1.2rem; color:var(--secondary);">
+          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+        </div>
+        <div style="font-size:0.85rem; color:var(--text-light);">Based on 1,200+ Reviews</div>
+      </div>
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <a href="https://wa.me/923001234567" target="_blank" class="btn btn-primary">
+          <i class="fab fa-whatsapp"></i> Share Your Experience
+        </a>
+        <a href="packages.html" class="btn btn-outline">
+          <i class="fas fa-compass"></i> Book Your Trip
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     CTA SECTION
+════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content">
+      <div class="cta-text fade-in">
+        <h2>Ready to Explore <br>Beautiful Pakistan? 🏔️</h2>
+        <p>Book your dream trip today and create memories that last forever.</p>
+      </div>
+      <div class="cta-actions fade-in">
+        <a href="packages.html" class="btn btn-secondary btn-lg">
+          <i class="fas fa-compass"></i> Browse Packages
+        </a>
+        <a href="https://wa.me/923001234567?text=Hello!%20I%20want%20to%20plan%20a%20trip." target="_blank" class="btn btn-white btn-lg">
+          <i class="fab fa-whatsapp"></i> WhatsApp Us
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="footer-logo-icon">✈</div>
+          <span class="footer-logo-name">Roshan Travels</span>
+        </div>
+        <p class="footer-desc">Pakistan's most trusted travel agency since 2012. We are dedicated to showcasing the breathtaking beauty of Pakistan to the world — one journey at a time.</p>
+        <div class="footer-social">
+          <a href="#" class="social-btn" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-btn" title="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-btn" title="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="#" class="social-btn" title="TikTok"><i class="fab fa-tiktok"></i></a>
+          <a href="#" class="social-btn" title="Twitter"><i class="fab fa-twitter"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+          <li><a href="packages.html"><i class="fas fa-chevron-right"></i> All Packages</a></li>
+          <li><a href="about.html"><i class="fas fa-chevron-right"></i> About Us</a></li>
+          <li><a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a></li>
+          <li><a href="dashboard.html"><i class="fas fa-chevron-right"></i> My Dashboard</a></li>
+          <li><a href="admin.html"><i class="fas fa-chevron-right"></i> Admin Panel</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Popular Tours</h4>
+        <ul class="footer-links">
+          <li><a href="package-detail.html?id=pkg-001"><i class="fas fa-chevron-right"></i> Hunza Valley</a></li>
+          <li><a href="package-detail.html?id=pkg-002"><i class="fas fa-chevron-right"></i> Skardu & Deosai</a></li>
+          <li><a href="package-detail.html?id=pkg-005"><i class="fas fa-chevron-right"></i> Fairy Meadows</a></li>
+          <li><a href="package-detail.html?id=pkg-003"><i class="fas fa-chevron-right"></i> Swat Valley</a></li>
+          <li><a href="package-detail.html?id=pkg-004"><i class="fas fa-chevron-right"></i> Lahore Heritage</a></li>
+          <li><a href="package-detail.html?id=pkg-007"><i class="fas fa-chevron-right"></i> Gwadar Coast</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Contact Us</h4>
+        <div class="footer-contact-item">
+          <div class="footer-contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <div class="footer-contact-text">2nd Floor, Travel Hub, Blue Area, Islamabad, Pakistan</div>
+        </div>
+        <div class="footer-contact-item">
+          <div class="footer-contact-icon"><i class="fas fa-phone-alt"></i></div>
+          <div class="footer-contact-text">+92 300 123 4567<br>+92 51 234 5678</div>
+        </div>
+        <div class="footer-contact-item">
+          <div class="footer-contact-icon"><i class="fas fa-envelope"></i></div>
+          <div class="footer-contact-text">info@roshantravels.pk<br>bookings@roshantravels.pk</div>
+        </div>
+        <a href="https://wa.me/923001234567" target="_blank" class="footer-whatsapp-btn">
+          <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2025 Roshan Travels. All rights reserved. Made with ❤️ for Pakistan.</p>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms & Conditions</a>
+        <a href="#">Refund Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════
+     AUTH MODAL
+════════════════════════════════════════ -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-user-circle" style="color:var(--primary);margin-right:8px;"></i> Account</h3>
+      <button class="modal-close" onclick="closeModal('auth-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <!-- Tabs -->
+      <div style="display:flex; gap:4px; background:var(--gray-100); padding:5px; border-radius:10px; margin-bottom:24px;">
+        <button class="detail-tab active auth-tab" data-tab="login" onclick="switchAuthTab('login')" style="flex:1;">Login</button>
+        <button class="detail-tab auth-tab" data-tab="register" onclick="switchAuthTab('register')" style="flex:1;">Create Account</button>
+      </div>
+
+      <!-- Login Panel -->
+      <div id="auth-login" class="auth-panel active">
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="login-email" class="form-input" placeholder="you@example.com" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="login-password" class="form-input" placeholder="Your password" required />
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;cursor:pointer;">
+              <input type="checkbox" /> Remember me
+            </label>
+            <a href="#" style="font-size:0.85rem;color:var(--primary);">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+          <div style="margin-top:12px; padding:10px; background:var(--accent); border-radius:8px; font-size:0.8rem; color:var(--primary);">
+            <strong>Admin Demo:</strong> admin@roshantravels.pk / admin123
+          </div>
+        </form>
+      </div>
+
+      <!-- Register Panel -->
+      <div id="auth-register" class="auth-panel" style="display:none;">
+        <form id="register-form">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="reg-name" class="form-input" placeholder="Ahmed Raza" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="reg-email" class="form-input" placeholder="you@example.com" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="reg-password" class="form-input" placeholder="Min. 6 characters" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" id="reg-confirm" class="form-input" placeholder="Repeat password" required />
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+            <i class="fas fa-user-plus"></i> Create Account
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Scripts ─── -->
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+// Fix auth panel switching
+document.querySelectorAll('.auth-panel').forEach(p => p.style.display = '');
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.auth-panel').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+  document.querySelector(`.auth-tab[data-tab="${tab}"]`).classList.add('active');
+  const panel = document.getElementById(`auth-${tab}`);
+  panel.style.display = 'block';
+  panel.classList.add('active');
+}
+switchAuthTab('login');
+
+// ─── Render Featured Packages ───
+function renderFeaturedPackages() {
+  const grid = document.getElementById('featured-packages-grid');
+  if (!grid) return;
+  const featured = PACKAGES_DATA.filter(p => p.featured).slice(0, 6);
+  grid.innerHTML = featured.map(pkg => `
+    <div class="package-card fade-in">
+      <div class="package-card-image">
+        <img src="${pkg.image}" alt="${pkg.title}" loading="lazy" />
+        ${pkg.badge ? `<span class="package-card-badge">${pkg.badge}</span>` : ''}
+        ${pkg.discount_percent > 0 ? `<span class="package-card-discount">${pkg.discount_percent}% OFF</span>` : ''}
+        <div class="package-card-wishlist wishlist-btn" data-id="${pkg.id}" title="Add to Wishlist">
+          <i class="fas fa-heart"></i>
+        </div>
+      </div>
+      <div class="package-card-body">
+        <div class="package-card-meta">
+          <span class="package-card-location"><i class="fas fa-map-marker-alt"></i> ${pkg.destination}</span>
+          <span class="package-card-rating"><i class="fas fa-star"></i> ${pkg.rating} (${pkg.reviews_count})</span>
+        </div>
+        <h3 class="package-card-title">${pkg.title}</h3>
+        <div class="package-card-highlights">
+          ${pkg.highlights.slice(0,3).map(h => `<span class="highlight-tag">✓ ${h}</span>`).join('')}
+        </div>
+        <div class="package-card-footer">
+          <span class="package-card-duration"><i class="far fa-clock"></i> ${pkg.duration}</span>
+          <div class="package-card-price">
+            ${pkg.discount_percent > 0 ? `<div class="price-original">${formatPKR(pkg.base_price)}</div>` : ''}
+            <div class="price-final">${formatPKR(pkg.final_price)}</div>
+            <div class="price-per">per person</div>
+          </div>
+        </div>
+        <div class="package-card-actions">
+          <a href="package-detail.html?id=${pkg.id}" class="btn btn-outline btn-sm" style="justify-content:center;">
+            <i class="fas fa-info-circle"></i> Details
+          </a>
+          <a href="package-detail.html?id=${pkg.id}#book" class="btn btn-primary btn-sm" style="justify-content:center;">
+            <i class="fas fa-calendar-check"></i> Book Now
+          </a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  initWishlists();
+  initScrollAnimations();
+}
+
+// ─── Render Destinations ───
+function renderDestinations() {
+  const grid = document.getElementById('destinations-grid');
+  if (!grid) return;
+  grid.innerHTML = DESTINATIONS_DATA.map((dest, i) => `
+    <div class="destination-card fade-in" onclick="window.location.href='packages.html?dest=${dest.slug}'">
+      <img src="${dest.image}" alt="${dest.name}" loading="lazy" />
+      <div class="destination-card-overlay"></div>
+      <div class="destination-card-arrow"><i class="fas fa-arrow-right"></i></div>
+      <div class="destination-card-info">
+        <div class="destination-card-name">${dest.name}</div>
+        <div class="destination-card-count">${dest.count} packages available</div>
+      </div>
+    </div>
+  `).join('');
+  initScrollAnimations();
+}
+
+// ─── Render Reviews ───
+function renderReviews() {
+  const grid = document.getElementById('reviews-grid');
+  if (!grid) return;
+  grid.innerHTML = REVIEWS_DATA.slice(0,6).map(rev => `
+    <div class="review-card fade-in">
+      <div class="review-quote">"</div>
+      <div class="review-stars">${renderStars(rev.rating)}</div>
+      <p class="review-text">${rev.comment}</p>
+      <div class="review-author">
+        <div class="review-avatar" style="background:${rev.gradient}">${rev.initials}</div>
+        <div class="review-author-info">
+          <h5>${rev.user_name}</h5>
+          <span><i class="fas fa-calendar-alt" style="margin-right:4px;font-size:0.7rem;"></i>${rev.travel_date}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  initScrollAnimations();
+}
+
+// Init page
+renderFeaturedPackages();
+renderDestinations();
+renderReviews();
+</script>
+</body>
+</html>
